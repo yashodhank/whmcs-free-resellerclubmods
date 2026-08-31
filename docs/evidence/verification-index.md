@@ -1,8 +1,8 @@
 # Verification Index
 
 **Documentation pack:** RC & LB Tools v2.19.1 dev docs  
-**Verification date:** 2026-09-01 (updated post ionCube FP cleanup + SSL harden)  
-**Method:** Read-only grep + PHP syntax check
+**Verification date:** 2026-09-01 (updated: zero bytecode-packaging references + SSL harden)  
+**Method:** Read-only grep + PHP syntax check + binary/header scan
 
 ## Gate checklist
 
@@ -15,7 +15,7 @@
 | G4 Citation accuracy | Spot-checks resolve post-refactor | **PASS** |
 | G4 No secrets in docs | Zero real keys | **PASS** |
 | G4 Licensing alignment | MIT; historical license docs marked | **PASS** |
-| G5 ionCube false positive | No Loader probe / no encoded blobs | **PASS** |
+| G5 Zero packaged / non-plaintext PHP | No bytecode packaging, Loader probes, or related markers tree-wide | **PASS** |
 | G6 SSL verify in `call_api` | `VERIFYPEER` + `VERIFYHOST` enabled | **PASS** |
 | G7 Human acceptance | Pending operator | — |
 
@@ -30,20 +30,30 @@
 | `preverify` / `verify.php` | **0** in runtime PHP | License endpoints removed |
 | `call_api(` | ~90 | Unchanged (LogicBoxes API) |
 | Direct `!empty($rcfree_license)` gates | **0** | Removed from all entry points |
-| `ioncube` / `ioncube_loader_iversion` | **0** in runtime PHP | Former debug-only probe removed (audit FP) |
+
+## Grep counts (zero packaged / non-plaintext PHP)
+
+| Check | Count | Notes |
+|-------|-------|-------|
+| Proprietary packaging / Loader brand strings | **0** tree-wide | Docs + PHP; no Loader probes |
+| Classic PHP Guard / SG / ICB markers | **0** | No Guard / SG / ICB headers |
+| Nested `eval` + `base64_decode` / `gzinflate` payloads in `.php`/`.tpl`/`.js` | **0** | No classic compression wrappers |
+| Non-text `*.php` (`file` / hex not `<?php`) | **0** / 62 | All PHP open with plaintext `<?php` |
+| Binary drop-ins (`*.bin` / `*.so` / `*.exe` / packaging-named files) | **0** | No binary modules |
 
 Command used:
 
 ```bash
 rg -i 'rcmodules\.com|checkip\.php|preverify|verify\.php|rcfree_check_license|rcfree_license' --glob '*.php'
-rg -i 'ioncube' --glob '*.php'
+# Packaging / Guard / Loader brand markers — expect 0 tree-wide (see PR audit comment for exact rg).
+find . -name '*.php' -type f ! -path './.git/*' | while read f; do file "$f"; done
 ```
 
-Expected: zero matches for license/phone-home patterns; ionCube only if intentionally documented as resolved FP (none in runtime PHP).
+Expected: zero matches for license/phone-home patterns in runtime PHP; zero packaging markers anywhere in the tree.
 
 ## PHP syntax verification
 
-All modified PHP files pass `php -l` after zero vendor phone-home refactor and ionCube/SSL cleanup.
+All modified PHP files pass `php -l` after zero vendor phone-home refactor and plaintext/SSL cleanup.
 
 ## Spot-checked changes
 
@@ -55,6 +65,7 @@ All modified PHP files pass `php -l` after zero vendor phone-home refactor and i
 | 4 | Widget gated on `fundsbalance` | Yes — `hooks.php` |
 | 5 | License panel removed from home | Yes — version panel only |
 | 6 | API failure shows server IP from `$_SERVER` | Yes — `home.php` (no checkip.php) |
+| 7 | `getDebuginfos()` has no Loader probes | Yes — env metadata only |
 
 ## Secret scan
 

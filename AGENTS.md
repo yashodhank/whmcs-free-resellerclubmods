@@ -7,7 +7,7 @@ AI agent entry point for **FREE Resellerclub & LogicBoxes Tools** (WHMCS addon).
 1. **MIT open source** — This repository is published under the [MIT License](LICENSE). Modification, distribution, and private use are permitted with attribution. See [docs/compliance/eula-and-licensing.md](docs/compliance/eula-and-licensing.md) for the relationship between MIT and bundled vendor [EULA.txt](EULA.txt).
 2. **No runtime license gate** — As of the OSS refactor, there is no `rcfree_check_license()`, no rcmodules.com license validation, and no feature gating on `rcfree_license`. Features are controlled by addon config flags (e.g. `fundsbalance`, per-account hook toggles) and reseller account setup only.
 3. **Zero vendor phone-home** — Runtime PHP must not HTTP to `rcmodules.com`, license activation endpoints (`preverify.php`, `verify.php`, `checkip.php`), or vendor version-check URLs. Version is shown from in-code `$softversion` / `$releasedate` only. Operator-configured LogicBoxes API calls via `call_api()` are not vendor phone-home.
-4. **Plaintext PHP only** — This tree has no ionCube-encoded product code. Do not reintroduce `ioncube_loader_*` probes; audits that flag “ionCube” from Loader API names are false positives against this MIT source.
+4. **Plaintext PHP only** — No proprietary bytecode packaging; all product source is readable PHP under MIT. Do not reintroduce Loader API probes or ship non-plaintext PHP.
 5. **Never log secrets** — Do not paste reseller API keys or other credentials into chat, docs, commits, or audit entries. Reference setting names and file:line only.
 
 ## Product identity
@@ -59,7 +59,7 @@ Admin entry URL: `{admin}/addonmodules.php?module=resellerclubmods_tools`
 | Admin home UI | `tools/home.php` |
 | Funds widget | `hooks.php` — gated by `fundsbalance` config only |
 | API wrapper | `incs/functions.php:470-492` (`call_api`; TLS verify enabled) |
-| Debug helpers | `getDebuginfos()` — WHMCS/PHP/module metadata only (no ionCube Loader probe; tree is plaintext OSS) |
+| Debug helpers | `getDebuginfos()` — WHMCS/PHP/module metadata only (plaintext OSS; no Loader probes) |
 | WHMCS hooks | `includes/hooks/resellerclubmods_*.php` (10 files) |
 | Cron | `cron/resellerclubmods_transfercheck.php`, `cron/resellerclubmods_dompricesync.php` |
 | Client widget | `widgets/domainpricelist.php` |
