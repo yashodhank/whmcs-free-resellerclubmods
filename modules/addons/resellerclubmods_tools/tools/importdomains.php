@@ -83,9 +83,9 @@ switch ($numqty) {
                         array_push($tldextensions, $fila_tlddata->extension);
                     }
                     $domainaddons_row = Illuminate\Database\Capsule\Manager::table("tblpricing")->where("relid", 0)->where("type", "domainaddons")->where("currency", $whmcsusercurrency)->select("msetupfee", "qsetupfee", "ssetupfee")->first();
-                    $dnsmanagement_price = $domainaddons_row ? (double) $domainaddons_row->msetupfee : 0;
-                    $emailforwarding_price = $domainaddons_row ? (double) $domainaddons_row->qsetupfee : 0;
-                    $idprotection_price = $domainaddons_row ? (double) $domainaddons_row->ssetupfee : 0;
+                    $dnsmanagement_price = $domainaddons_row ? (float) $domainaddons_row->msetupfee : 0;
+                    $emailforwarding_price = $domainaddons_row ? (float) $domainaddons_row->qsetupfee : 0;
+                    $idprotection_price = $domainaddons_row ? (float) $domainaddons_row->ssetupfee : 0;
                     echo $configuredto;
                     echo "<h3>" . $LANG["domainimportresult"] . "</h3>";
                     echo "<table bgcolor=\"#ffffff\" cellspacing=\"1\" width=\"100%\"><tr><td>";
@@ -364,9 +364,9 @@ switch ($numqty) {
                                     } else {
                                         $whmcsusercurrency = isset($clientCurrency[$whmcs_id]) ? $clientCurrency[$whmcs_id] : 1;
                                         $addonRow = isset($domainAddonPricing[$whmcsusercurrency]) ? $domainAddonPricing[$whmcsusercurrency] : NULL;
-                                        $dnsmanagement_price = $addonRow ? (double) $addonRow->msetupfee : 0;
-                                        $emailforwarding_price = $addonRow ? (double) $addonRow->qsetupfee : 0;
-                                        $idprotection_price = $addonRow ? (double) $addonRow->ssetupfee : 0;
+                                        $dnsmanagement_price = $addonRow ? (float) $addonRow->msetupfee : 0;
+                                        $emailforwarding_price = $addonRow ? (float) $addonRow->qsetupfee : 0;
+                                        $idprotection_price = $addonRow ? (float) $addonRow->ssetupfee : 0;
                                         $registrar = $logicbox_registrar;
                                         if (in_array($logicbox_registrar . "rcm", $tblregistrars)) {
                                             $registrar = $logicbox_registrar . "rcm";
@@ -398,7 +398,7 @@ switch ($numqty) {
                                             $domainPriceCacheRegister[$registerKey] = $rows;
                                         }
                                         $fila_tblpricing_register = $domainPriceCacheRegister[$registerKey];
-                                        $firstpaymentamount = (double) ($fila_tblpricing_register[0]->msetupfee ?? 0) + (double) $dnsmanagement_price + (double) $emailforwarding_price + (double) $idprotection_price;
+                                        $firstpaymentamount = (float) ($fila_tblpricing_register[0]->msetupfee ?? 0) + (float) $dnsmanagement_price + (float) $emailforwarding_price + (float) $idprotection_price;
                                         $type_renew_tblpricing = "domainrenew";
                                         $renewKey = $id_tbldomainpricing . "|" . $whmcsusercurrency . "|" . $tsetupfee;
                                         if (!isset($domainPriceCacheRenew[$renewKey])) {
@@ -409,7 +409,7 @@ switch ($numqty) {
                                             $domainPriceCacheRenew[$renewKey] = $rows;
                                         }
                                         $fila_tblpricing_renew = $domainPriceCacheRenew[$renewKey];
-                                        $recurringamount = (double) ($fila_tblpricing_renew[0]->msetupfee ?? 0) + (double) $dnsmanagement_price + (double) $emailforwarding_price + (double) $idprotection_price;
+                                        $recurringamount = (float) ($fila_tblpricing_renew[0]->msetupfee ?? 0) + (float) $dnsmanagement_price + (float) $emailforwarding_price + (float) $idprotection_price;
                                         $domdata[] = ["registrar" => $registrar, "customerid" => $data_custid, "orderid" => $data_entorderid, "domain" => $data_entdomname, "tld" => $istld, "registrationperiod" => $registrationperiod, "type" => "Register", "status" => "Active", "orderdate" => date("Y-m-d H:i:s", $data_entordercrdt), "registrationdate" => date("Y-m-d", $data_entordercrdt), "expiredate" => date("Y-m-d", $data_entorderend), "nextduedate" => date("Y-m-d", $data_entorderend), "nextinvoicedate" => date("Y-m-d", $data_entorderend), "whmcsusername" => $username, "whmcsid" => $whmcs_id, "paymentmethod" => $paymentmethod, "firstpaymentamount" => $firstpaymentamount, "recurringamount" => $recurringamount, "dnsmanagement" => $dnsmanagement, "emailforwarding" => $emailforwarding, "idprotection" => $is_privacystatus, "nameservers" => "", "contactid" => $contactid, "invoiceid" => $invoiceid];
                                         sort($domdata);
                                     }

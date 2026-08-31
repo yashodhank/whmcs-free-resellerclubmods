@@ -1378,10 +1378,10 @@ for ($ri = $offset; $ri < $offset + $perPage && $ri < $totalRows; $ri++) {
     $profit_margin = 0;
     if (!empty($inpromotld[$whmcs_value]["domainregister"])) {
         if (0 < $registercostprice && isset($profitexception[$whmcs_value]["domainregister"]) && is_numeric($profitexception[$whmcs_value]["domainregister"])) {
-            $profit_margin = round((double) $profitexception[$whmcs_value]["domainregister"] / (double) $registercostprice * 100 - 100, 2);
+            $profit_margin = round((float) $profitexception[$whmcs_value]["domainregister"] / (float) $registercostprice * 100 - 100, 2);
         }
-    } else if (0 < $registercostprice && is_numeric($msetupfee_register) && 0 < (double) $msetupfee_register) {
-        $profit_margin = round((double) $msetupfee_register / (double) $registercostprice * 100 - 100, 2);
+    } else if (0 < $registercostprice && is_numeric($msetupfee_register) && 0 < (float) $msetupfee_register) {
+        $profit_margin = round((float) $msetupfee_register / (float) $registercostprice * 100 - 100, 2);
     }
     if (!empty($buycurrencyrate)) {
         if ($profit_margin < 0) {
