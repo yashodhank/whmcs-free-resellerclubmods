@@ -1,0 +1,57 @@
+<?php
+if (!defined("WHMCS")) {
+    exit("This file cannot be accessed directly");
+}
+echo "<script type=\"text/javascript\">// <![CDATA[\r\njQuery(document).ready(function(){\r\n  jQuery(\".scroll\").click(function(event){\r\n    event.preventDefault();\r\n    var offset = jQuery(jQuery(this).attr('href')).offset().top;\r\n    jQuery('html, body').animate({scrollTop:offset}, 1000);\r\n  });\r\n});\r\n// ]]></script>";
+echo $configuredto;
+echo "<a id=\"top\"></a>";
+echo "<h1>" . $LANG["automationtools"] . "</h1>";
+echo "<div class=\"alert alert-warning\" style=\"width:100%;text-align:left;\"><strong>" . $LANG["note"] . "</strong> " . $LANG["optionflagsdesc0"] . "</div><br />";
+echo "<div class=\"alert alert-info\" style=\"width:100%;text-align:left;\"><strong>" . $LANG["note"] . "</strong> " . $LANG["optionflagsdesc3"] . "</div><br />";
+echo "<ul><li><a class=\"scroll\" href=\"#tool01\">" . $LANG["domainpricesynctitle"] . "</a></li><li><a class=\"scroll\" href=\"#tool02\">" . $LANG["transfercheckautotitle"] . "</a></li><li><a class=\"scroll\" href=\"#tool04\">" . $LANG["cartintegrationtitle"] . "</a></li></ul><br />";
+echo "<div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radius: 5px;-webkit-border-radius: 5px;-o-border-radius: 5px;border-radius: 5px;\">";
+echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><strong>" . $LANG["tratroublestitle"] . "</strong></h3>";
+echo "<p>" . $LANG["tratroublesdesc04"] . "</p>";
+echo "<ol><li>" . $LANG["tratroublesdesc01"] . "<pre style=\"border:solid 1px #cccccc;padding:10px;background-color:#f5f5f5;\">&lt;?php \$fullpath_to_whmcs = &quot;" . ROOTDIR . "&quot;; ?&gt;</pre></li>";
+echo "<li>" . $LANG["tratroublesdesc03"] . " " . ROOTDIR . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . "resellerclubmods_tools" . DIRECTORY_SEPARATOR . "cron" . DIRECTORY_SEPARATOR . "</li></ol><br /><br />";
+echo "</div><br /><br /><div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radius: 5px;-webkit-border-radius: 5px;-o-border-radius: 5px;border-radius: 5px;\"><a id=\"tool01\"></a>";
+echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-decoration:none;\" href=\"#top\" class=\"scroll\">(Top)</a> <strong>" . $LANG["domainpricesynctitle"] . "</strong></h3>";
+echo "<p>" . $LANG["domainpricesyncdesc"] . "</p>";
+echo "<h3>" . $LANG["automateddomsynctitle"] . "</h3>";
+echo "<p>" . $LANG["automateddomsyncdesc"] . "</p>";
+echo $LANG["automateddomsyncdesc2"];
+echo "<p><a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["domainpricesyncdesc2"] . "</a></p>";
+echo "<div class=\"contentbox\">";
+echo "<div><strong>" . $LANG["transfercheckautodesc1"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"php -q " . ROOTDIR . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . "resellerclubmods_tools" . DIRECTORY_SEPARATOR . "cron" . DIRECTORY_SEPARATOR . "resellerclubmods_dompricesync.php " . $rcauth_userid . "\" /><br /><br />";
+echo "<div><strong>" . $LANG["onlyorword"] . " " . $LANG["transfercheckautodesc2"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"GET " . $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/cron/resellerclubmods_dompricesync.php?id=" . $rcauth_userid . "\" /><br /><br />";
+echo "<div><strong>" . $LANG["onlyorword"] . " " . $LANG["transfercheckautodesc3"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"lynx -dump -accept_all_cookies " . $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/cron/resellerclubmods_dompricesync.php?id=" . $rcauth_userid . "\" /><br /><br />";
+echo "</div><br /></div><br /><br /><a name=\"transfercheck\"></a><a id=\"tool02\"></a><div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radius: 5px;-webkit-border-radius: 5px;-o-border-radius: 5px;border-radius: 5px;\">";
+echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-decoration:none;\" href=\"#top\" class=\"scroll\">(Top)</a> <strong>" . $LANG["transfercheckautotitle"] . "</strong></h3>";
+echo "<p>" . $LANG["transfercheckautodesc"] . "</p>";
+echo "<h3>" . $LANG["automatedtransfertitle"] . "</h3>";
+echo "<p>" . $LANG["automatedtransferdesc"] . "</p>";
+echo $LANG["automatedtransferdesc2"];
+echo "<p>" . $LANG["transfercheckautodesc4"] . "</p>";
+echo "<p><a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["transfercheckautodesc5"] . "</a></p>";
+echo "<div class=\"contentbox\">";
+echo "<div><strong>" . $LANG["transfercheckautodesc1"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"php -q " . ROOTDIR . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "addons" . DIRECTORY_SEPARATOR . "resellerclubmods_tools" . DIRECTORY_SEPARATOR . "cron" . DIRECTORY_SEPARATOR . "resellerclubmods_transfercheck.php " . $rcauth_userid . "\" /><br /><br />";
+echo "<div><strong>" . $LANG["onlyorword"] . " " . $LANG["transfercheckautodesc2"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"GET " . $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/cron/resellerclubmods_transfercheck.php?id=" . $rcauth_userid . "\" /><br /><br />";
+echo "<div><strong>" . $LANG["onlyorword"] . " " . $LANG["transfercheckautodesc3"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"lynx -dump -accept_all_cookies " . $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/cron/resellerclubmods_transfercheck.php?id=" . $rcauth_userid . "\" /><br /><br />";
+echo "</div><br /></div><br /><br /><div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radius: 5px;-webkit-border-radius: 5px;-o-border-radius: 5px;border-radius: 5px;\"><a id=\"tool04\"></a>";
+echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-decoration:none;\" href=\"#top\" class=\"scroll\">(Top)</a> <strong>" . $LANG["cartintegrationtitle"] . "</strong></h3>";
+echo "<p>" . $LANG["cartintegrationdesc1"] . "</p><p>" . $LANG["cartintegrationdesc2"] . "</p>";
+echo "<h3>" . $LANG["cartintegrationsubtitle"] . "</h3>";
+echo $LANG["cartintegrationdesc3"];
+echo "<p><a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["cartintegrationdesc4"] . "</a></p>";
+echo "<div class=\"contentbox\">";
+echo "<div><strong>" . $LANG["cartintegrationurl"] . "</strong></div>";
+echo "<input class=\"form-control\" type=\"text\" style=\"width:100%\" value=\"" . $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/tools/authlogin.php\" /><br /><br />";
+echo "</div></div><br /><br />";
+
+?>
