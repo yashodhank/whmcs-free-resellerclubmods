@@ -623,7 +623,7 @@ function resellerclubmods_tools_config()
     if ($is_adminlang != $tool_default_lang && file_exists(ROOTDIR . "/modules/addons/resellerclubmods_tools/lang/" . $is_adminlang . ".php")) {
         $tool_default_lang = $is_adminlang;
     }
-    $configarray = ["name" => "RC & LB Tools v2", "version" => "2.19.1", "author" => "<img src=\"../modules/addons/resellerclubmods_tools/img/rcmini.png\" alt=\"Resellerclub Mods RC & LB Tools v2\" title=\"Resellerclub Mods RC & LB Tools v2\"/>", "language" => $tool_default_lang, "description" => "<a id=\"top\"></a>This module shows your ResellerClub & LogicBoxes funds account balance on your admin home page and offers a set with other useful management tools for your Reseller account (MIT open source).", "fields" => $merged];
+    $configarray = ["name" => "RC & LB Tools v2", "version" => "2.19.2", "author" => "<img src=\"../modules/addons/resellerclubmods_tools/img/rcmini.png\" alt=\"Resellerclub Mods RC & LB Tools v2\" title=\"Resellerclub Mods RC & LB Tools v2\"/>", "language" => $tool_default_lang, "description" => "<a id=\"top\"></a>This module shows your ResellerClub & LogicBoxes funds account balance on your admin home page and offers a set with other useful management tools for your Reseller account (MIT open source).", "fields" => $merged];
     return $configarray;
 }
 function resellerclubmods_tools_activate()

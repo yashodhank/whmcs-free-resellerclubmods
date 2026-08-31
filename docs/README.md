@@ -1,6 +1,6 @@
 # RC & LB Tools — Developer Documentation
 
-**Product:** FREE Resellerclub & LogicBoxes Tools **v2.19.1** (release 2026-01-29)  
+**Product:** FREE Resellerclub & LogicBoxes Tools **v2.19.2** (release 2026-09-01)  
 **Module ID:** `resellerclubmods_tools`
 
 ## Executive summary (SCQA)
@@ -52,7 +52,17 @@ Per [README.txt](../README.txt):
 | Client area / licensing | https://www.resellerclub-mods.com/whmcs/clientarea.php |
 | WHMCS Marketplace | https://marketplace.whmcs.com/product/534 |
 
-In-repo docs supplement—not replace—vendor documentation. When versions diverge, trust `incs/functions.php` (`$softversion = "2.19.1"`) and vendor changelog.
+In-repo docs supplement—not replace—vendor documentation. When versions diverge, trust `incs/functions.php` (`$softversion = "2.19.2"`) and vendor changelog.
+
+## Compatibility matrix
+
+| Component | Supported |
+|-----------|-----------|
+| PHP | 7.4, 8.0, 8.1, 8.2, 8.3, 8.4 |
+| WHMCS | 8.x, 9.x |
+| ionCube Loader | Not required (plaintext MIT OSS) |
+
+CI runs `php -l` across all PHP files on PHP 7.4–8.4 (see `.github/workflows/php-compat.yml`).
 
 ## Repository layout
 
@@ -70,7 +80,7 @@ docs/
 
 ## Version note
 
-All documentation in this tree targets **v2.19.1**. Re-verify grep counts and line citations after upgrading the addon.
+All documentation in this tree targets **v2.19.2**. Re-verify grep counts and line citations after upgrading the addon.
 
 ## Repository license
 

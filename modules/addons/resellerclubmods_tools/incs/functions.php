@@ -2,8 +2,20 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
-$releasedate = "2026-01-29";
-$softversion = "2.19.1";
+$releasedate = "2026-09-01";
+$softversion = "2.19.2";
+if (!function_exists("utf8_encode")) {
+    function utf8_encode($string)
+    {
+        return mb_convert_encoding($string, "UTF-8", "ISO-8859-1");
+    }
+}
+if (!function_exists("utf8_decode")) {
+    function utf8_decode($string)
+    {
+        return mb_convert_encoding($string, "ISO-8859-1", "UTF-8");
+    }
+}
 if (!function_exists("adminemailmessages")) {
     function adminemailmessages($mailtpltype, $mailsubject, $mailmessage, $apiadminuser)
     {
