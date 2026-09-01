@@ -133,22 +133,22 @@ $price_details = $_GET["details"];
             if (is_numeric($conf_arr["first"][0]) && !empty($conf_arr["first"][1])) {
                 $rcauth_userid = $conf_arr["first"][0];
                 $rcauth_password = $conf_arr["first"][1];
-                $mplicator = $conf_arr["first"][2];
+                $mplicator = (float) $conf_arr["first"][2];
                 $reseller_default_currency = $conf_arr["first"][3];
             } else if (is_numeric($conf_arr["second"][0]) && !empty($conf_arr["second"][1])) {
                 $rcauth_userid = $conf_arr["second"][0];
                 $rcauth_password = $conf_arr["second"][1];
-                $mplicator = $conf_arr["second"][2];
+                $mplicator = (float) $conf_arr["second"][2];
                 $reseller_default_currency = $conf_arr["second"][3];
             } else if (is_numeric($conf_arr["third"][0]) && !empty($conf_arr["third"][1])) {
                 $rcauth_userid = $conf_arr["third"][0];
                 $rcauth_password = $conf_arr["third"][1];
-                $mplicator = $conf_arr["third"][2];
+                $mplicator = (float) $conf_arr["third"][2];
                 $reseller_default_currency = $conf_arr["third"][3];
             } else if (is_numeric($conf_arr["fourth"][0]) && !empty($conf_arr["fourth"][1])) {
                 $rcauth_userid = $conf_arr["fourth"][0];
                 $rcauth_password = $conf_arr["fourth"][1];
-                $mplicator = $conf_arr["fourth"][2];
+                $mplicator = (float) $conf_arr["fourth"][2];
                 $reseller_default_currency = $conf_arr["fourth"][3];
             }
             $result = Illuminate\Database\Capsule\Manager::table("tblcurrencies")->where("default", "=", "1")->select("code")->get();

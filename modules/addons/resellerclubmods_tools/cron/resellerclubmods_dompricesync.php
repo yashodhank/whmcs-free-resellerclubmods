@@ -62,11 +62,14 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
         if (in_array($rid, $conf_values)) {
             $rcauth_userid = rcm_trim($conf_values[0]);
             $rcauth_password = rcm_trim($conf_values[1]);
-            list($currencyswitch, $multiplicator) = $conf_values;
+            $currencyswitch = $conf_values[2];
+            $multiplicator = (float) $conf_values[3];
             $defaultcurrency = rcm_trim($conf_values[4]);
             $domainsynccheck = $conf_values[5];
             $domainsynctlds = rcm_trim($conf_values[6]);
-            list($domainsyncall, $domainsynctelescope, $currencydoupd) = $conf_values;
+            $domainsyncall = $conf_values[7];
+            $domainsynctelescope = $conf_values[8];
+            $currencydoupd = $conf_values[9];
             $domainsyncexcludetlds = rcm_trim($conf_values[10]);
             $redemptiondoupd = $conf_values[11];
         }
@@ -152,6 +155,7 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
             if (empty($currencyrate)) {
                 $currencyrate = 1;
             }
+            $currencyrate = (float) $currencyrate;
             $currency = Illuminate\Database\Capsule\Manager::table("tblcurrencies")->where("default", "=", 1)->value("id");
             if (empty($currency)) {
                 $currency = 1;

@@ -80,7 +80,7 @@ function resellerclubmods_tools_output($vars)
             $logicbox_registrar = $vars["first_domainregistrar"];
             $defaultcurrency = $vars["first_defaultcurrency"];
             $currencyswitch = $vars["first_currencyswitch"];
-            $multiplicator = $vars["first_multiplicator"];
+            $multiplicator = (float) $vars["first_multiplicator"];
             $account_name = $vars["first_acc_name"];
             $account_number = 1;
             $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
@@ -92,7 +92,7 @@ function resellerclubmods_tools_output($vars)
             $logicbox_registrar = $vars["second_domainregistrar"];
             $defaultcurrency = $vars["second_defaultcurrency"];
             $currencyswitch = $vars["second_currencyswitch"];
-            $multiplicator = $vars["second_multiplicator"];
+            $multiplicator = (float) $vars["second_multiplicator"];
             $account_name = $vars["second_acc_name"];
             $account_number = 2;
             $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
@@ -104,7 +104,7 @@ function resellerclubmods_tools_output($vars)
             $logicbox_registrar = $vars["third_domainregistrar"];
             $defaultcurrency = $vars["third_defaultcurrency"];
             $currencyswitch = $vars["third_currencyswitch"];
-            $multiplicator = $vars["third_multiplicator"];
+            $multiplicator = (float) $vars["third_multiplicator"];
             $account_name = $vars["third_acc_name"];
             $account_number = 3;
             $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
@@ -116,7 +116,7 @@ function resellerclubmods_tools_output($vars)
             $logicbox_registrar = $vars["fourth_domainregistrar"];
             $defaultcurrency = $vars["fourth_defaultcurrency"];
             $currencyswitch = $vars["fourth_currencyswitch"];
-            $multiplicator = $vars["fourth_multiplicator"];
+            $multiplicator = (float) $vars["fourth_multiplicator"];
             $account_name = $vars["fourth_acc_name"];
             $account_number = 4;
             $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
@@ -133,7 +133,7 @@ function resellerclubmods_tools_output($vars)
     $logicbox_registrar = $result[0]->logicbox_registrar;
     $defaultcurrency = $result[0]->defaultcurrency;
     $currencyswitch = $result[0]->currencyswitch;
-    $multiplicator = $result[0]->multiplicator;
+    $multiplicator = (float) $result[0]->multiplicator;
     $account_name = $result[0]->account_name;
     $lockey = $result[0]->localkey;
     $syncdate = $result[0]->lastcheck;
@@ -386,7 +386,7 @@ function resellerclubmods_tools_output($vars)
     $reseller_sellingcurrency = $currencycode;
     if ($currencyswitch == "on") {
         $result = Illuminate\Database\Capsule\Manager::table("tblcurrencies")->where("code", "=", $defaultcurrency)->select("rate")->get();
-        $currencyrate = $result[0]->rate;
+        $currencyrate = (float) $result[0]->rate;
     }
     echo "<table style=\"margin-bottom:10px;\"><tr><td><img style=\"float:left;border:0\" src=\"../modules/addons/resellerclubmods_tools/img/rcmini.png\" /></td>\r\n\t\t\t\t <td style=\"padding:5px 0px 0px 5px;\"><strong>" . $LANG["freetoolslike"] . "</strong> " . $LANG["followus"] . ": <a href=\"https://facebook.com/resmods\" target=\"_blank\">Facebook</a> <a href=\"https://twitter.com/resmods\" arget=\"_blank\">Twitter</a><br />\r\n\t\t\t\t " . $LANG["freetoolslikevote1"] . " <a href=\"https://marketplace.whmcs.com/product/534\" target=\"_blank\">WHMCS Marketplace</a>. " . $LANG["freetoolslikevote2"] . "<br />\r\n\t\t\t\t </td></tr></table>";
     $selectorarray = [];
