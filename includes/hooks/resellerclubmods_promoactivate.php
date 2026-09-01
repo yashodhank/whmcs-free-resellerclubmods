@@ -15,7 +15,7 @@ function promo_auto_activate($vars)
     $rcauth_password = $conf["first_rcauth_apikey"];
     $rchttp_api = $conf["rchttp_api"];
     $currencyswitch = $conf["first_currencyswitch"];
-    $multiplicator = $conf["first_multiplicator"];
+    $multiplicator = (float) $conf["first_multiplicator"];
     $defaultcurrency = $conf["first_defaultcurrency"];
     $is_currencydoupd = $conf["domainsync_currencydoupd"];
     $promo_auto_activate = $conf["promo_auto_activate"];
@@ -32,7 +32,7 @@ function promo_auto_activate($vars)
         $LANG = $_ADDONLANG;
         $clientgroupid = "0.00";
         $reseller_tblcurrencies = Illuminate\Database\Capsule\Manager::table("tblcurrencies")->where("code", "=", $defaultcurrency)->select("rate")->get();
-        $currencyrate = $reseller_tblcurrencies[0]->rate;
+        $currencyrate = (float) $reseller_tblcurrencies[0]->rate;
         $fila_tblcurrencies = Illuminate\Database\Capsule\Manager::table("tblcurrencies")->where("default", "=", 1)->select("id")->get();
         $currency = $fila_tblcurrencies[0]->id;
         $in_whmcs_extensions = [];
