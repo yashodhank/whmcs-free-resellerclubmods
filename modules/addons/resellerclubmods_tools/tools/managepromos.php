@@ -420,11 +420,11 @@ if (!empty($xml_getpromosdetails)) {
         $starttime = $promos["starttime"];
         $endtime = $promos["endtime"];
         if ($currencyswitch == "on") {
-            $customerprice = round($promos["customerprice"] * $multiplicator / $currencyrate, 2);
-            $barrierprice = $reseller_buycurrency . " " . round($promos["barrierprice"] * $multiplicator / $currencyrate, 2);
+            $customerprice = round((float) $promos["customerprice"] * $multiplicator / $currencyrate, 2);
+            $barrierprice = $reseller_buycurrency . " " . round((float) $promos["barrierprice"] * $multiplicator / $currencyrate, 2);
         } else {
-            $customerprice = round($promos["customerprice"] * $multiplicator, 2);
-            $barrierprice = round($promos["barrierprice"] * $multiplicator, 2);
+            $customerprice = round((float) $promos["customerprice"] * $multiplicator, 2);
+            $barrierprice = round((float) $promos["barrierprice"] * $multiplicator, 2);
         }
         if ($promos["actiontype"] == "addnewdomain") {
             $domtype = "domainregister";
