@@ -202,11 +202,11 @@ foreach ($rc_productkey_array as $rc_productkey => $rc_productvals) {
 }
 $costdb_array = [];
 foreach ($costnewproductprice_array as $keytld => $valuetld) {
-    $costdb_array["registerfee"][$keytld] = $valuetld["addnewdomain"][1] * $is_mplicator;
-    $costdb_array["renewfee"][$keytld] = $valuetld["renewdomain"][1] * $is_mplicator;
-    $costdb_array["transferfee"][$keytld] = $valuetld["addtransferdomain"][1] * $is_mplicator;
+    $costdb_array["registerfee"][$keytld] = (float) $valuetld["addnewdomain"][1] * $is_mplicator;
+    $costdb_array["renewfee"][$keytld] = (float) $valuetld["renewdomain"][1] * $is_mplicator;
+    $costdb_array["transferfee"][$keytld] = (float) $valuetld["addtransferdomain"][1] * $is_mplicator;
     if (!empty($valuetld["restoredomain"][1])) {
-        $costdb_array["restorefee"][$keytld] = $valuetld["restoredomain"][1] * $is_mplicator;
+        $costdb_array["restorefee"][$keytld] = (float) $valuetld["restoredomain"][1] * $is_mplicator;
     }
 }
 if ($filtered == 0) {
@@ -369,7 +369,7 @@ if (isset($_POST["tldpricings"]) && $_POST["tldpricings"] == $whmcsextension) {
             $redemption_add = "-1";
             $redemption_days = "-1";
             if ($add_values["restoredomain"][1]) {
-                $redemption_add = $add_values["restoredomain"][1] * $multiplicator;
+                $redemption_add = (float) $add_values["restoredomain"][1] * $multiplicator;
                 $redemption_days = $redemption_array[$whmcsextension][1];
             }
         }

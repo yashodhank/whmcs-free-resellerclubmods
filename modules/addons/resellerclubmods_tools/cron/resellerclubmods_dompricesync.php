@@ -271,7 +271,7 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
                 ksort($add_values["addnewdomain"]);
                 if ($add_key == $minmax_reg_array[$add_key][0]) {
                     $addk = $billingslabs[$minmax_reg_array[$add_key][1]];
-                    $dbadd_array[$addk] = $add_values["addnewdomain"][$minmax_reg_array[$add_key][1]] * $minmax_reg_array[$add_key][1];
+                    $dbadd_array[$addk] = (float) $add_values["addnewdomain"][$minmax_reg_array[$add_key][1]] * $minmax_reg_array[$add_key][1];
                 } else {
                     foreach ($add_values["addnewdomain"] as $k => $v) {
                         if ($k == 1) {
@@ -304,13 +304,13 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
                         if ($k == 10) {
                             $addk = "biennially";
                         }
-                        $dbadd_array[$addk] = $v * $multiplicator * $mplicator_add++;
+                        $dbadd_array[$addk] = (float) $v * $multiplicator * $mplicator_add++;
                     }
                 }
                 $redemption_add = "-1";
                 $redemption_days = "-1";
                 if ($add_values["restoredomain"][1]) {
-                    $redemption_add = $add_values["restoredomain"][1] * $multiplicator;
+                    $redemption_add = (float) $add_values["restoredomain"][1] * $multiplicator;
                     $redemption_days = $redemption_array[$add_key][1];
                 }
                 if ($domainsynctelescope == "on") {
@@ -521,7 +521,7 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
                 ksort($ren_values["renewdomain"]);
                 if ($ren_key == $minmax_ren_array[$ren_key][0]) {
                     $renk = $billingslabs[$minmax_ren_array[$ren_key][1]];
-                    $dbren_array[$renk] = $ren_values["renewdomain"][$minmax_ren_array[$ren_key][1]] * $minmax_ren_array[$ren_key][1];
+                    $dbren_array[$renk] = (float) $ren_values["renewdomain"][$minmax_ren_array[$ren_key][1]] * $minmax_ren_array[$ren_key][1];
                 } else {
                     foreach ($ren_values["renewdomain"] as $k => $v) {
                         if ($k == 1) {
@@ -554,7 +554,7 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
                         if ($k == 10) {
                             $renk = "biennially";
                         }
-                        $dbren_array[$renk] = $v * $multiplicator * $mplicator_ren++;
+                        $dbren_array[$renk] = (float) $v * $multiplicator * $mplicator_ren++;
                     }
                 }
                 if ($domainsynctelescope == "on") {
@@ -766,7 +766,7 @@ foreach (Illuminate\Database\Capsule\Manager::table("tbladdonmodules")->where("m
                     }
                 } else {
                     $trak = "msetupfee";
-                    $dbtra_array[$trak] = $tra_values["addtransferdomain"][1] * $multiplicator * $mplicator_tra++;
+                    $dbtra_array[$trak] = (float) $tra_values["addtransferdomain"][1] * $multiplicator * $mplicator_tra++;
                 }
                 if (!isset($dbtra_array["msetupfee"])) {
                     $msetupfee_tra = "-1";
