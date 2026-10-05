@@ -2,7 +2,7 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
-$rcm_pagination = new rcm_pagination();
+$rcm_pagination = new RcmToolsPagination();
 $mypageno = $_GET["page"];
 if (empty($vars["userimport_value"])) {
     $noofrecords = 100;

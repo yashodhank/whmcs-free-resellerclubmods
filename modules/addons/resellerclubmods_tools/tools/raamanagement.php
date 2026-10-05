@@ -88,7 +88,7 @@ if (isset($_REQUEST["raaresend"]) && $_REQUEST["raaresend"] == "true") {
     }
     echo "<div class=\"alert alert-danger\"><p>" . $LANG["raaerror"] . " <strong>" . $raaemail . "</strong>. " . $LANG["ptryaglater"] . "</p></div>";
 }
-$rcm_pagination = new rcm_pagination();
+$rcm_pagination = new RcmToolsPagination();
 $pag_no_ofrecords = 50;
 $method = "GET";
 $apifunction = "/api/domains/search.json";
