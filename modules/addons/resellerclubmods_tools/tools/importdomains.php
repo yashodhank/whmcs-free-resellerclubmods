@@ -666,7 +666,7 @@ switch ($numqty) {
                         }
                     }
                     $onlyImportable = isset($_REQUEST["onlyimportable"]) && $_REQUEST["onlyimportable"] == "1";
-                    $rcm_pagination = new rcm_pagination();
+                    $rcm_pagination = new RcmToolsPagination();
                     $rcm_pagination->maxPageLinks = 11;
                     $num0 = 0;
                     $num1 = 0;

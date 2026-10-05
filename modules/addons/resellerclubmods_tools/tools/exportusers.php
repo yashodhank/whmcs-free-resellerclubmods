@@ -41,7 +41,7 @@ if (isset($_POST["register"]) && $_POST["register"] == "true") {
             echo "<div class=\"alert alert-success\"><p>" . $LANG["allcustcreated"] . "</p></div>";
         }
     }
-    $rcm_pagination = new rcm_pagination();
+    $rcm_pagination = new RcmToolsPagination();
     $whmcs_userdata = [];
     foreach (Illuminate\Database\Capsule\Manager::table("tblclients")->select("firstname", "lastname", "companyname", "address1", "address2", "city", "state", "postcode", "country", "phonenumber", "email")->get() as $customervars) {
         $whmcs_userdata[] = json_decode(json_encode($customervars), true);
@@ -87,7 +87,7 @@ if (isset($_POST["register"]) && $_POST["register"] == "true") {
     echo "<tr><td colspan=\"2\"><input value=\"" . $LANG["rcexportbutton"] . "\" class=\"btn btn-success\" type=\"submit\"></td></tr>";
     echo "</form></table>";
 } else {
-    $rcm_pagination = new rcm_pagination();
+    $rcm_pagination = new RcmToolsPagination();
     $whmcs_userdata = [];
     foreach (Illuminate\Database\Capsule\Manager::table("tblclients")->select("firstname", "lastname", "companyname", "address1", "address2", "city", "state", "postcode", "country", "phonenumber", "email")->get() as $customervars) {
         $whmcs_userdata[] = json_decode(json_encode($customervars), true);
