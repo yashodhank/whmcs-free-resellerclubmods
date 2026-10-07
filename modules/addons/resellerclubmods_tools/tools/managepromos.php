@@ -2,6 +2,9 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
+if (strtoupper((string) ($_SERVER["REQUEST_METHOD"] ?? "GET")) === "POST") {
+    rcm_require_post_token();
+}
 echo "<script type=\"text/javascript\">// <![CDATA[\r\njQuery(document).ready(function(){\r\n  jQuery(\".scroll\").click(function(event){\r\n    event.preventDefault();\r\n    var offset = jQuery(jQuery(this).attr('href')).offset().top;\r\n    jQuery('html, body').animate({scrollTop:offset}, 1000);\r\n  });\r\n});\r\n// ]]></script>";
 $sync_icon = "<i class=\"fa fa-refresh\"></i>";
 if (0 <= version_compare(getWver(), "7.0.0")) {
@@ -188,7 +191,7 @@ if (isset($_POST["undoupd"])) {
         Illuminate\Database\Capsule\Manager::table("tbldomainpricing")->where("id", "=", $relid)->update($update);
     }
     echo "<div class=\"alert alert-success\"><p>" . $LANG["multipromoupdatesuccess1"] . " ";
-    echo $_POST["tld"] . " " . $LANG["sellingundoupdatesuccess"] . " " . $currencycode . " " . $_POST["sellingprice"] . "</p></div>";
+    echo rcm_e($_POST["tld"] ?? "") . " " . $LANG["sellingundoupdatesuccess"] . " " . $currencycode . " " . $_POST["sellingprice"] . "</p></div>";
 }
 if (isset($_REQUEST["promoprice"]) && empty($_REQUEST["promoprice"])) {
     echo $promoempty_errormessage;
@@ -406,12 +409,12 @@ if (isset($_POST["applypromo"]) && !empty($_POST["promotlds"])) {
     }
 }
 $method = "GET";
-if (empty($_SESSION["rcm_promodetails"][$rcauth_userid])) {
+if ((rcm_session_cache_get("rcm_promodetails." . $rcauth_userid) === null)) {
     $apifunction = "/api/resellers/promo-details.json";
     $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-    $_SESSION["rcm_promodetails"][$rcauth_userid] = serialize($xml_getpromosdetails);
+    rcm_session_cache_set("rcm_promodetails." . $rcauth_userid, $xml_getpromosdetails);
 } else {
-    $xml_getpromosdetails = unserialize($_SESSION["rcm_promodetails"][$rcauth_userid]);
+    $xml_getpromosdetails = rcm_session_cache_get("rcm_promodetails." . $rcauth_userid);
 }
 $thirdlevelpromos = [];
 $toplevelpromos = [];
@@ -473,7 +476,7 @@ if ($is_currencydoupd != "on") {
     $currency_update_active = "<span " . $style_labelwarn . ">" . $LANG["disabled"] . "</span>";
 }
 if (isset($_REQUEST["tld"]) && isset($_REQUEST["currency"]) && isset($_REQUEST["promoprice"])) {
-    echo "<div class=\"alert alert-success\"><p>" . $LANG["multipromoupdatesuccess1"] . " <strong>" . $_REQUEST["tld"] . "</strong> " . $LANG["multipromoupdatesuccess2"] . " " . $_REQUEST["currency"] . " " . $_REQUEST["promoprice"] . "</p></div>";
+    echo "<div class=\"alert alert-success\"><p>" . $LANG["multipromoupdatesuccess1"] . " <strong>" . rcm_e($_REQUEST["tld"] ?? "") . "</strong> " . $LANG["multipromoupdatesuccess2"] . " " . rcm_e($_REQUEST["currency"] ?? "") . " " . rcm_e($_REQUEST["promoprice"] ?? "") . "</p></div>";
 }
 echo $configuredto;
 echo "<h1>" . $LANG["domainpromos"] . "</h1>";
@@ -518,12 +521,12 @@ if (isset($inpromotlds[0])) {
                     echo "<td><span style=\"color:#cc0000;\">" . $LANG["promoregistrarend"] . "</span></td>";
                 }
                 echo "<td>";
-                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">\r\n\t\t\t\t <input type=\"hidden\" name=\"sellingprice\" value=\"" . $oldpromotlds["sellingprice"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"type\" value=\"" . $oldpromotlds["type"] . "\"/>\r\n\t\t\t \t <input type=\"hidden\" name=\"relid\" value=\"" . $oldpromotlds["relid"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"tld\" value=\"" . $oldpromotlds["extension"] . "\"/>\r\n\t\t\t \t <input class=\"btn btn-danger btn-sm\" name=\"undoupd\" value=\"" . $LANG["upddombutton"] . "\" type=\"submit\"></form>";
+                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">" . rcm_token_field() . "\r\n\t\t\t\t <input type=\"hidden\" name=\"sellingprice\" value=\"" . $oldpromotlds["sellingprice"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"type\" value=\"" . $oldpromotlds["type"] . "\"/>\r\n\t\t\t \t <input type=\"hidden\" name=\"relid\" value=\"" . $oldpromotlds["relid"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"tld\" value=\"" . $oldpromotlds["extension"] . "\"/>\r\n\t\t\t \t <input class=\"btn btn-danger btn-sm\" name=\"undoupd\" value=\"" . $LANG["upddombutton"] . "\" type=\"submit\"></form>";
                 echo "</td>";
             } else if ($oldpromotlds["promoend"] <= $datenow) {
                 echo "<td><span style=\"color:#cc0000;\">" . $oldpromotlds["promoend"] . " UTC</span></td>";
                 echo "<td>";
-                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">\r\n\t\t\t\t <input type=\"hidden\" name=\"sellingprice\" value=\"" . $oldpromotlds["sellingprice"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"type\" value=\"" . $oldpromotlds["type"] . "\"/>\r\n\t\t\t \t <input type=\"hidden\" name=\"relid\" value=\"" . $oldpromotlds["relid"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"tld\" value=\"" . $oldpromotlds["extension"] . "\"/>\r\n\t\t\t \t <input class=\"btn btn-danger btn-sm\" name=\"undoupd\" value=\"" . $LANG["upddombutton"] . "\" type=\"submit\"></form>";
+                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">" . rcm_token_field() . "\r\n\t\t\t\t <input type=\"hidden\" name=\"sellingprice\" value=\"" . $oldpromotlds["sellingprice"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"type\" value=\"" . $oldpromotlds["type"] . "\"/>\r\n\t\t\t \t <input type=\"hidden\" name=\"relid\" value=\"" . $oldpromotlds["relid"] . "\"/>\r\n\t\t\t\t <input type=\"hidden\" name=\"tld\" value=\"" . $oldpromotlds["extension"] . "\"/>\r\n\t\t\t \t <input class=\"btn btn-danger btn-sm\" name=\"undoupd\" value=\"" . $LANG["upddombutton"] . "\" type=\"submit\"></form>";
                 echo "</td>";
             } else {
                 echo "<td><span style=\"color:#438743;\">" . $oldpromotlds["promoend"] . " UTC</span></td>";
@@ -542,7 +545,7 @@ echo "<div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radiu
 echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><strong>" . $LANG["promomanualtitle"] . "</strong></h3>";
 echo "<div style=\"width:100%\"><div class=\"homewidget\"><div class=\"widget-header\">";
 echo "<span style=\"font-size:16px;\">" . $promo_arr["Domain extension"] . "</span></div>";
-echo "<div class=\"widget-content\"><div><form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\"><table class=\"datatable\" border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\">";
+echo "<div class=\"widget-content\"><div><form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">" . rcm_token_field() . "<table class=\"datatable\" border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\">";
 echo "<tr><th>" . $LANG["activepromoregistrartitle"] . "</th><th>manual</th></tr>";
 echo "<tr><td>" . $LANG["promoend"] . "</td><td><input class=\"form-control\" style=\"display: inline; width: auto\" size=\"30\" type=\"text\" name=\"promoend\" value=\"" . $enddate . "\" />&nbsp;UTC " . $LANG["promodateformat"] . "</td></tr>";
 echo "<tr><td>Select TLD and Domain type</td><td><select class=\"form-control\" style=\"display: inline; width: auto\" name=\"manualpromosetup\">" . $option . "</select></td></tr>";
@@ -683,7 +686,7 @@ if (!empty($xml_getpromosdetails)) {
                 echo "<a style=\"text-decoration:none;\" class=\"scroll\" href=\"#top\">(top)</a>&nbsp;&nbsp;<span style=\"font-size:14px;opacity: 0.5\">" . str_replace(",", " - ", $promo_arr["Domain extension"]) . "</span></div>";
                 echo "<div class=\"widget-content\"><div>";
                 echo $inactive_message;
-                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\"><table class=\"datatable\" border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\">";
+                echo "<form action=\"addonmodules.php?module=resellerclubmods_tools&domain=showpromos\" method=\"post\">" . rcm_token_field() . "<table class=\"datatable\" border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\">";
                 echo "<tr><th>" . $LANG["activepromoregistrartitle"] . "</th><th>" . $logicbox_registrar . "</th></tr>";
                 echo "<tr><td>" . $LANG["promostart"] . " - " . $LANG["promoend"] . "</td><td>" . $LANG["fromdate"] . " <strong>" . $promo_arr["starttime"] . " UTC</strong> " . $LANG["untildate"] . " <strong>" . $promo_arr["endtime"] . " UTC</strong></td></tr>";
                 echo $promo_sellingprice;
