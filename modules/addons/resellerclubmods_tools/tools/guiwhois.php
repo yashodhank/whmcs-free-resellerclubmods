@@ -3,13 +3,13 @@ if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
 echo "<script type=\"text/javascript\">// <![CDATA[\r\njQuery(document).ready(function(){\r\n  jQuery(\".scroll\").click(function(event){\r\n    event.preventDefault();\r\n    var offset = jQuery(jQuery(this).attr('href')).offset().top;\r\n    jQuery('html, body').animate({scrollTop:offset}, 1000);\r\n  });\r\n});\r\n// ]]></script>";
-$md5_wid = substr(md5($vars["wid_key"]), 6, 10);
+$md5_wid = rcm_whois_key_acceptable($vars["wid_key"] ?? "") ? rcm_whois_wid_expected($vars["wid_key"]) : "";
 $reseller_whoisurl = $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/tools/whois.php?wid=" . $md5_wid . "&domain=|HTTPREQUEST-available";
 $url = "addonmodules.php?module=resellerclubmods_tools&domain=rcmwhois";
 $file_whoisservers = ROOTDIR . "/includes/whoisservers.php";
 echo $configuredto;
-if (empty($vars["wid_key"]) || $vars["wid_key"] == "FB7koUY1aX") {
-    echo "<div class=\"alert alert-warning\"><p>" . $LANG["warnwhoissecret"] . " <a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["clicktoconfigure"] . "</a></p></div>";
+if (!rcm_whois_key_acceptable($vars["wid_key"] ?? "") || ($vars["wid_key"] ?? "") == "FB7koUY1aX") {
+    echo "<div class=\"alert alert-warning\"><p>" . $LANG["warnwhoissecret"] . " <a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["clicktoconfigure"] . "</a> (min 16 chars; HTTP whois uses HMAC wid as of 2.19.3)</p></div>";
 } else {
     if (!is_writable($file_whoisservers)) {
         $disablebuttons = "disabled=\"disabled\"";
@@ -61,7 +61,7 @@ if (empty($vars["wid_key"]) || $vars["wid_key"] == "FB7koUY1aX") {
     echo "<div class=\"alert alert-warning\"><p><strong>" . $LANG["note"] . "</strong> " . $LANG["onlyselectlbtlds"] . "</p></div>";
     echo "<table><tr><td style=\"vertical-align:top;\">";
     echo "<p><strong>WHMCS " . $LANG["bulkalltldusing"] . "</strong><br />" . $LANG["tldtitle"] . " >> " . $LANG["registrarmoduletitle"] . "</p>";
-    echo "<form action=\"#tool01\" method=\"post\"><input type=\"hidden\" name=\"autowhoissetup\" value=\"true\" /><select class=\"form-control\" style=\"display: inline; width auto\" name=\"tldlist[]\" size=\"10\" multiple=\"multiple\">";
+    echo "<form action=\"#tool01\" method=\"post\">" . rcm_token_field() . "<input type=\"hidden\" name=\"autowhoissetup\" value=\"true\" /><select class=\"form-control\" style=\"display: inline; width auto\" name=\"tldlist[]\" size=\"10\" multiple=\"multiple\">";
     foreach ($tldextensions as $extension => $autoreg) {
         if (empty($autoreg)) {
             $autoreg = "none";
@@ -141,7 +141,7 @@ if (empty($vars["wid_key"]) || $vars["wid_key"] == "FB7koUY1aX") {
     $text = file_get_contents($file_whoisservers);
     echo "<div style=\"padding: 5px 20px;border: 1px solid #CCCCCC;-moz-border-radius: 5px;-webkit-border-radius: 5px;-o-border-radius: 5px;border-radius: 5px;\">";
     echo "<p><strong>whoisservers.php</strong>: " . $writable . "</p>";
-    echo "<form action=\"#tool02\" method=\"post\">";
+    echo "<form action=\"#tool02\" method=\"post\">" . rcm_token_field() . "";
     echo "<textarea name=\"whoisservertext\" class=\"form-control\" style=\"font-size:12px;\" cols=\"180\" rows=\"20\">" . $text . "</textarea>";
     echo "<input type=\"hidden\" name=\"manualwhoissetup\" value=\"true\"/>";
     echo "<br /><p align=\"center\"><input class=\"btn btn-success\" type=\"submit\" value=\"" . $LANG["whoissavebutton"] . "\" " . $disablebuttons . "/>&nbsp;<input class=\"btn btn-primary\" type=\"reset\" value=\"" . $LANG["whoisresetbutton"] . "\" " . $disablebuttons . " /></p>";
