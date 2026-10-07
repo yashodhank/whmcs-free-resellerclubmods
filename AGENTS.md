@@ -111,10 +111,6 @@ Both families read `tbladdonmodules` for addon settings independently.
 | `mod_resellerclubmodsraa` | RAA resend tracking |
 | `mod_resellerclubmodstransfer` | Transfer-check tracking |
 
-## graphify (optional)
-
-If `graphify-out/graph.json` exists, run `graphify query "<question>"` before broad grepping. After doc-only changes, `graphify update .` is optional.
-
 ## External references
 
 - Requirements / install / changelog: [README.txt](README.txt) → resellerclub-mods.com (documentation links only; no runtime callbacks)
