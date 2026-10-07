@@ -2,7 +2,7 @@ name: PHP compatibility
 
 on:
   push:
-    branches: [main, refactor/oss-remove-license-gate, feat/php74-84-compat-v2.19.2]
+    branches: [main, fix/security-hardening-2.19.3]
   pull_request:
     branches: [main]
 
@@ -38,3 +38,8 @@ jobs:
         run: |
           ! rg -n 'ionCube|SourceGuardian|Zend Guard|eval\s*\(\s*gzinflate' \
             modules/addons/resellerclubmods_tools includes/hooks widgets || exit 1
+
+      - name: Security verify gate
+        run: |
+          chmod +x scripts/verify-security.sh
+          bash scripts/verify-security.sh
