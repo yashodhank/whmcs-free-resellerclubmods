@@ -157,17 +157,16 @@ function widget_resellerclubmods_tools()
                     $apifunction = "/api/billing/reseller-balance.json";
                     $data = ["reseller-id" => $rcauth_userid];
                     $xml_fundsbalancedetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                    $newavailable_balance = $xml_fundsbalancedetails["sellingcurrencybalance"];
-                    $newblocked_balance = $xml_fundsbalancedetails["sellingcurrencylockedbalance"];
-                    $blockedbalance = round($newblocked_balance * $is_mplicator, 2);
-                    $totalbalance = round($newavailable_balance * $is_mplicator, 2);
-                    $availablebalance = round($totalbalance - $blockedbalance * $is_mplicator, 2);
-                    $threshold_percent = round($reseller_fundthreshold * 0, 2);
-                    if ($availablebalance < $threshold_percent && $reseller_fundthreshold < $availablebalance) {
+                    $funds = rcm_compute_funds($xml_fundsbalancedetails["sellingcurrencybalance"] ?? 0, $xml_fundsbalancedetails["sellingcurrencylockedbalance"] ?? 0, $reseller_buycurrency);
+                    $blockedbalance = $funds["blocked"];
+                    $totalbalance = $funds["total"];
+                    $availablebalance = $funds["available"];
+                    $priority = rcm_funds_priority($availablebalance, $reseller_fundthreshold);
+                    if ($priority === "medium") {
                         $fundsalert1 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/mediumpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritymedium"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($reseller_fundthreshold < $availablebalance) {
+                    } else if ($priority === "low") {
                         $fundsalert1 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/lowpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritylow"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($availablebalance <= $reseller_fundthreshold) {
+                    } else if ($priority === "high") {
                         $fundsalert1 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/highpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["priorityhigh"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
                     }
                     $content1 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\">\r\n\t\t\t\t\t\t\t\t" . $registrar_icon . "&nbsp;<u><strong>" . $account_name . "&nbsp;-&nbsp;" . $_ADDONLANG["fundstitle"] . "</strong></u><br />" . $_ADDONLANG["totalfunds"] . "\r\n\t\t\t\t\t\t\t\t&nbsp;<strong style=\"color:" . $totalfundscolor . "\">" . $reseller_buysymbol . $totalbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp;" . $_ADDONLANG["blockedfunds"] . "&nbsp;<strong style=\"color:" . $blockedfundscolor . "\">" . $reseller_buysymbol . $blockedbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp; " . $_ADDONLANG["availablefunds"] . "&nbsp;<strong style=\"color:" . $availfundscolor . "\">" . $reseller_buysymbol . $availablebalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t<br />" . $fundsalert1 . "</div><br />";
@@ -219,17 +218,16 @@ function widget_resellerclubmods_tools()
                     $apifunction = "/api/billing/reseller-balance.json";
                     $data = ["reseller-id" => $rcauth_userid];
                     $xml_fundsbalancedetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                    $newavailable_balance = $xml_fundsbalancedetails["sellingcurrencybalance"];
-                    $newblocked_balance = $xml_fundsbalancedetails["sellingcurrencylockedbalance"];
-                    $blockedbalance = round($newblocked_balance * $is_mplicator, 2);
-                    $totalbalance = round($newavailable_balance * $is_mplicator, 2);
-                    $availablebalance = round($totalbalance - $blockedbalance * $is_mplicator, 2);
-                    $threshold_percent = round($reseller_fundthreshold * 0, 2);
-                    if ($availablebalance < $threshold_percent && $reseller_fundthreshold < $availablebalance) {
+                    $funds = rcm_compute_funds($xml_fundsbalancedetails["sellingcurrencybalance"] ?? 0, $xml_fundsbalancedetails["sellingcurrencylockedbalance"] ?? 0, $reseller_buycurrency);
+                    $blockedbalance = $funds["blocked"];
+                    $totalbalance = $funds["total"];
+                    $availablebalance = $funds["available"];
+                    $priority = rcm_funds_priority($availablebalance, $reseller_fundthreshold);
+                    if ($priority === "medium") {
                         $fundsalert2 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/mediumpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritymedium"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($reseller_fundthreshold < $availablebalance) {
+                    } else if ($priority === "low") {
                         $fundsalert2 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/lowpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritylow"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($availablebalance <= $reseller_fundthreshold) {
+                    } else if ($priority === "high") {
                         $fundsalert2 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/highpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["priorityhigh"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
                     }
                     $content2 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\">\r\n\t\t\t\t\t\t\t\t" . $registrar_icon . "&nbsp;<u><strong>" . $account_name . "&nbsp;-&nbsp;" . $_ADDONLANG["fundstitle"] . "</strong></u><br />" . $_ADDONLANG["totalfunds"] . "\r\n\t\t\t\t\t\t\t\t&nbsp;<strong style=\"color:" . $totalfundscolor . "\">" . $reseller_buysymbol . $totalbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp;" . $_ADDONLANG["blockedfunds"] . "&nbsp;<strong style=\"color:" . $blockedfundscolor . "\">" . $reseller_buysymbol . $blockedbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp; " . $_ADDONLANG["availablefunds"] . "&nbsp;<strong style=\"color:" . $availfundscolor . "\">" . $reseller_buysymbol . $availablebalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t<br />" . $fundsalert2 . "</div><br />";
@@ -281,17 +279,16 @@ function widget_resellerclubmods_tools()
                     $apifunction = "/api/billing/reseller-balance.json";
                     $data = ["reseller-id" => $rcauth_userid];
                     $xml_fundsbalancedetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                    $newavailable_balance = $xml_fundsbalancedetails["sellingcurrencybalance"];
-                    $newblocked_balance = $xml_fundsbalancedetails["sellingcurrencylockedbalance"];
-                    $blockedbalance = round($newblocked_balance * $is_mplicator, 2);
-                    $totalbalance = round($newavailable_balance * $is_mplicator, 2);
-                    $availablebalance = round($totalbalance - $blockedbalance * $is_mplicator, 2);
-                    $threshold_percent = round($reseller_fundthreshold * 0, 2);
-                    if ($availablebalance < $threshold_percent && $reseller_fundthreshold < $availablebalance) {
+                    $funds = rcm_compute_funds($xml_fundsbalancedetails["sellingcurrencybalance"] ?? 0, $xml_fundsbalancedetails["sellingcurrencylockedbalance"] ?? 0, $reseller_buycurrency);
+                    $blockedbalance = $funds["blocked"];
+                    $totalbalance = $funds["total"];
+                    $availablebalance = $funds["available"];
+                    $priority = rcm_funds_priority($availablebalance, $reseller_fundthreshold);
+                    if ($priority === "medium") {
                         $fundsalert3 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/mediumpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritymedium"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($reseller_fundthreshold < $availablebalance) {
+                    } else if ($priority === "low") {
                         $fundsalert3 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/lowpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritylow"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($availablebalance <= $reseller_fundthreshold) {
+                    } else if ($priority === "high") {
                         $fundsalert3 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/highpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["priorityhigh"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
                     }
                     $content3 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\">\r\n\t\t\t\t\t\t\t\t" . $registrar_icon . "&nbsp;<u><strong>" . $account_name . "&nbsp;-&nbsp;" . $_ADDONLANG["fundstitle"] . "</strong></u><br />" . $_ADDONLANG["totalfunds"] . "\r\n\t\t\t\t\t\t\t\t&nbsp;<strong style=\"color:" . $totalfundscolor . "\">" . $reseller_buysymbol . $totalbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp;" . $_ADDONLANG["blockedfunds"] . "&nbsp;<strong style=\"color:" . $blockedfundscolor . "\">" . $reseller_buysymbol . $blockedbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp; " . $_ADDONLANG["availablefunds"] . "&nbsp;<strong style=\"color:" . $availfundscolor . "\">" . $reseller_buysymbol . $availablebalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t<br />" . $fundsalert3 . "</div><br />";
@@ -343,17 +340,16 @@ function widget_resellerclubmods_tools()
                     $apifunction = "/api/billing/reseller-balance.json";
                     $data = ["reseller-id" => $rcauth_userid];
                     $xml_fundsbalancedetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                    $newavailable_balance = $xml_fundsbalancedetails["sellingcurrencybalance"];
-                    $newblocked_balance = $xml_fundsbalancedetails["sellingcurrencylockedbalance"];
-                    $blockedbalance = round($newblocked_balance * $is_mplicator, 2);
-                    $totalbalance = round($newavailable_balance * $is_mplicator, 2);
-                    $availablebalance = round($totalbalance - $blockedbalance * $is_mplicator, 2);
-                    $threshold_percent = round($reseller_fundthreshold * 0, 2);
-                    if ($availablebalance < $threshold_percent && $reseller_fundthreshold < $availablebalance) {
+                    $funds = rcm_compute_funds($xml_fundsbalancedetails["sellingcurrencybalance"] ?? 0, $xml_fundsbalancedetails["sellingcurrencylockedbalance"] ?? 0, $reseller_buycurrency);
+                    $blockedbalance = $funds["blocked"];
+                    $totalbalance = $funds["total"];
+                    $availablebalance = $funds["available"];
+                    $priority = rcm_funds_priority($availablebalance, $reseller_fundthreshold);
+                    if ($priority === "medium") {
                         $fundsalert4 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/mediumpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritymedium"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($reseller_fundthreshold < $availablebalance) {
+                    } else if ($priority === "low") {
                         $fundsalert4 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/lowpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["prioritylow"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
-                    } else if ($availablebalance <= $reseller_fundthreshold) {
+                    } else if ($priority === "high") {
                         $fundsalert4 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\"><img src=\"../modules/addons/resellerclubmods_tools/img/highpriority.png\" align=\"absmiddle\" border=\"0\"> " . $_ADDONLANG["priorityhigh"] . " (" . $reseller_buysymbol . $reseller_fundthreshold . " " . $reseller_buycurrency . ")</div>";
                     }
                     $content4 = "<div style=\"font-size:" . $fontsize . "px;font-family:" . $fontfamily . "\">\r\n\t\t\t\t\t\t\t\t" . $registrar_icon . "&nbsp;<u><strong>" . $account_name . "&nbsp;-&nbsp;" . $_ADDONLANG["fundstitle"] . "</strong></u><br />" . $_ADDONLANG["totalfunds"] . "\r\n\t\t\t\t\t\t\t\t&nbsp;<strong style=\"color:" . $totalfundscolor . "\">" . $reseller_buysymbol . $totalbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp;" . $_ADDONLANG["blockedfunds"] . "&nbsp;<strong style=\"color:" . $blockedfundscolor . "\">" . $reseller_buysymbol . $blockedbalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t&nbsp; " . $_ADDONLANG["availablefunds"] . "&nbsp;<strong style=\"color:" . $availfundscolor . "\">" . $reseller_buysymbol . $availablebalance . "&nbsp;" . $reseller_buycurrency . "</strong>\r\n\t\t\t\t\t\t\t\t<br />" . $fundsalert4 . "</div><br />";
