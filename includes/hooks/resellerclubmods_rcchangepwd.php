@@ -38,7 +38,7 @@ function change_rc_cupwd($vars)
                     $action = "change password";
                     $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
                     $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $changepasswd];
-                    logModuleCall($modulename, $action, $requeststring, $responsedata);
+                    rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
                     if ($changepasswd["status"] != "ERROR") {
                         logActivity("Customer password successfully changed in " . $logicbox_registrar . " (" . $rcauth_userid . ") - User: " . $vars["email"] . " - User ID: " . $vars["userid"]);
                     } else {

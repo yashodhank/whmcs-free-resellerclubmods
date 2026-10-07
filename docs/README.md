@@ -1,6 +1,6 @@
 # RC & LB Tools — Developer Documentation
 
-**Product:** FREE Resellerclub & LogicBoxes Tools **v2.19.2** (release 2026-09-01)  
+**Product:** FREE Resellerclub & LogicBoxes Tools **v2.19.3** (release 2026-10-07)  
 **Module ID:** `resellerclubmods_tools`
 
 ## Executive summary (SCQA)
@@ -26,6 +26,8 @@
 7. [correlation/gate-matrix.md](correlation/gate-matrix.md) — Feature config gates (post-OSS)
 8. [architecture/diagrams.md](architecture/diagrams.md) — Mermaid flows
 9. [evidence/verification-index.md](evidence/verification-index.md) — Grep evidence and READY verdict
+10. [evidence/system-map.md](evidence/system-map.md) — Cross-component dependency & blast-radius map
+11. [evidence/findings-2.19.3.md](evidence/findings-2.19.3.md) — RCM-001…019 security findings
 
 Supporting: [PRD.md](PRD.md) (documentation initiative scope).
 

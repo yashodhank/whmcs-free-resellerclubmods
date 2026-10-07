@@ -6,13 +6,13 @@ if ($CONFIG["domainLookupProvider"] != "WhmcsWhois" && $CONFIG["domainLookupProv
     echo "<div class=\"alert alert-warning\"><p><strong>" . $CONFIG["domainLookupProvider"] . " " . $LANG["lookupprovidererror"] . "</strong></p><span>" . $LANG["lookupprovidermessage"] . "</span></a></div>";
 } else {
     echo "<script type=\"text/javascript\">// <![CDATA[\r\n\tjQuery(document).ready(function(){\r\n\t  jQuery(\".scroll\").click(function(event){\r\n\t\tevent.preventDefault();\r\n\t\tvar offset = jQuery(jQuery(this).attr('href')).offset().top;\r\n\t\tjQuery('html, body').animate({scrollTop:offset}, 1000);\r\n\t  });\r\n\t});\r\n\t// ]]></script>";
-    $md5_wid = substr(md5($vars["wid_key"]), 6, 10);
+    $md5_wid = rcm_whois_key_acceptable($vars["wid_key"] ?? "") ? rcm_whois_wid_expected($vars["wid_key"]) : "";
     $reseller_whoisurl = $CONFIG["SystemURL"] . "/modules/addons/resellerclubmods_tools/tools/whois.php?wid=" . $md5_wid . "&domain=";
     $url = "addonmodules.php?module=resellerclubmods_tools&domain=rcmwhois";
     $file_whoisservers = ROOTDIR . "/resources/domains/whois.json";
     echo $configuredto;
-    if (empty($vars["wid_key"]) || $vars["wid_key"] == "FB7koUY1aX") {
-        echo "<div class=\"alert alert-warning\"><p>" . $LANG["warnwhoissecret"] . " <a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["clicktoconfigure"] . "</a></p></div>";
+    if (!rcm_whois_key_acceptable($vars["wid_key"] ?? "") || ($vars["wid_key"] ?? "") == "FB7koUY1aX") {
+        echo "<div class=\"alert alert-warning\"><p>" . $LANG["warnwhoissecret"] . " <a href=\"configaddonmods.php#resellerclubmods_tools\">" . $LANG["clicktoconfigure"] . "</a> (min 16 chars; HTTP whois uses HMAC wid as of 2.19.3)</p></div>";
     } else {
         if (file_exists($file_whoisservers) && !is_writable($file_whoisservers)) {
             $disablebuttons = "disabled=\"disabled\"";
@@ -53,7 +53,7 @@ if ($CONFIG["domainLookupProvider"] != "WhmcsWhois" && $CONFIG["domainLookupProv
                     $result = file_put_contents($file_whoisservers, $whoislist);
                 }
                 echo "<div class=\"alert alert-success\"><p>";
-                echo implode(", ", $_POST["tldlist"]) . " TLD have been added to the API WHOIS Server Definition!";
+                echo rcm_e(implode(", ", (array) ($_POST["tldlist"] ?? []))) . " TLD have been added to the API WHOIS Server Definition!";
                 echo "</p></div>";
             }
         }
@@ -118,7 +118,7 @@ if ($CONFIG["domainLookupProvider"] != "WhmcsWhois" && $CONFIG["domainLookupProv
         echo "<div class=\"alert alert-warning\"><p><strong>" . $LANG["note"] . "</strong> " . $LANG["onlyselectlbtlds"] . "</p></div>";
         echo "<table><tr><td style=\"vertical-align:top;\">";
         echo "<p><strong>WHMCS " . $LANG["bulkalltldusing"] . "</strong><br />" . $LANG["tldtitle"] . " >> " . $LANG["registrarmoduletitle"] . "</p>";
-        echo "<form action=\"#tool01\" method=\"post\"><input type=\"hidden\" name=\"autowhoissetup\" value=\"true\" /><select class=\"form-control\" style=\"display: inline; width auto\" name=\"tldlist[]\" size=\"10\" multiple=\"multiple\">";
+        echo "<form action=\"#tool01\" method=\"post\">" . rcm_token_field() . "<input type=\"hidden\" name=\"autowhoissetup\" value=\"true\" /><select class=\"form-control\" style=\"display: inline; width auto\" name=\"tldlist[]\" size=\"10\" multiple=\"multiple\">";
         foreach ($tldextensions as $extension => $autoreg) {
             if (empty($autoreg)) {
                 $autoreg = "none";
@@ -189,7 +189,7 @@ if ($CONFIG["domainLookupProvider"] != "WhmcsWhois" && $CONFIG["domainLookupProv
         echo "<p><strong>" . $LANG["whoisjsondefinition"] . "</strong>:<br />" . $LANG["whoisjsondefinitionnote"];
         echo "<pre>[<br />    {<br />        \"extensions\": \".com,.net\",<br />";
         echo "        \"uri\": \"" . $reseller_whoisurl . "\",<br />";
-        echo "        \"available\": \"available\"<br />    }<br />]<br /></pre></p><form action=\"#tool02\" method=\"post\">";
+        echo "        \"available\": \"available\"<br />    }<br />]<br /></pre></p><form action=\"#tool02\" method=\"post\">" . rcm_token_field() . "";
         echo "<textarea name=\"whoisservertext\" class=\"form-control\" style=\"font-size:12px;\" cols=\"180\" rows=\"20\">" . $text . "</textarea>";
         echo "<input type=\"hidden\" name=\"manualwhoissetup\" value=\"true\"/>";
         echo "<br /><p align=\"center\"><input class=\"btn btn-success\" type=\"submit\" value=\"" . $LANG["whoisjsonsavebutton"] . "\" " . $disablebuttons . "/>&nbsp;<input class=\"btn btn-primary\" type=\"reset\" value=\"" . $LANG["whoisresetbutton"] . "\" " . $disablebuttons . " /></p>";

@@ -235,10 +235,17 @@ function resellerclubmods_tools_clientarea($vars)
                     $movedomainid = $_REQUEST["domainid"];
                     $newcustomer = $_REQUEST["newcustomer"];
                     $contactdetails = $_REQUEST["contact"];
-                    $datavalidated = $_REQUEST["datavalidated"];
-                    $result = Illuminate\Database\Capsule\Manager::table("tblclients")->where("email", "=", $newcustomer)->select("id")->get();
-                    $newcustomer_id = $result[0]->id;
-                    if (isset($_REQUEST["confirmed"]) && $_REQUEST["confirmed"] == "yes") {
+                    // Never trust client-supplied datavalidated (RCM-008) — re-validate destination client.
+                    $datavalidated = "false";
+                    $result = Illuminate\Database\Capsule\Manager::table("tblclients")->where("email", "=", $newcustomer)->select("id", "email")->get();
+                    $newcustomer_id = isset($result[0]) ? $result[0]->id : null;
+                    if (!empty($result[0]->email) && (int) $newcustomer_id !== (int) $currentuserid) {
+                        $datavalidated = "true";
+                        $checked_email = $result[0]->email;
+                    }
+                    if ($datavalidated !== "true" || empty($newcustomer_id)) {
+                        $move_error = $LANG["validerror01"] ?? "Invalid destination client";
+                    } else if (isset($_REQUEST["confirmed"]) && $_REQUEST["confirmed"] == "yes") {
                         $method = "GET";
                         $apifunction = "/api/customers/details.json";
                         $data = ["username" => $newcustomer];
@@ -259,7 +266,7 @@ function resellerclubmods_tools_clientarea($vars)
                         $action = "clientarea move domain";
                         $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
                         $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $moveXml];
-                        logModuleCall($modulename, $action, $requeststring, $responsedata);
+                        rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
                         if ($_SESSION["adminloggedinstatus"] == "true") {
                             $adminmove = "WHMCS Admin on Behalf of";
                         }

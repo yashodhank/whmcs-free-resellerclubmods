@@ -141,7 +141,7 @@ function modify_rc_account($vars)
                     $action = "Modify Customer";
                     $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
                     $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $modify_rc_customer];
-                    logModuleCall($modulename, $action, $requeststring, $responsedata);
+                    rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
                     if ($modify_rc_customer == "true") {
                         logActivity("Customer successfully modified at " . $logicbox_registrar . " (" . $rcauth_userid . ") - Old User Email: " . $vars["olddata"]["email"] . " - New User Email: " . $vars["email"] . " - User ID: " . $vars["userid"], $vars["userid"]);
                     } else {

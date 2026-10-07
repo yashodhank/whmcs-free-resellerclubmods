@@ -62,7 +62,7 @@ if (isset($_POST["dobulkmove"]) && $_POST["dobulkmove"] == "true") {
             $action = "Bulk Move";
             $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
             $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $movedomains];
-            logModuleCall($modulename, $action, $requeststring, $responsedata);
+            rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
             echo "<strong>#" . $num++ . "</strong> " . $user_result;
             if ($movedomains["status"] == "Success") {
                 echo "<strong style=\"color:#0D6306;\">" . $domains . "</strong> " . $LANG["bulkmovesuccessto"] . " " . $new_rcauth_userid . "<hr /><br />";

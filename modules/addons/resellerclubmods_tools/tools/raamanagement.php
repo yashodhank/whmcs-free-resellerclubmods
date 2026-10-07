@@ -14,8 +14,8 @@ if ($timezone != "UTC") {
 echo $configuredto;
 echo "<h1>" . $LANG["raamanagementtitlelong"] . "</h1>";
 $page = $_REQUEST["page"];
-if ($_REQUEST["raaaction"] == "success") {
-    $raaemail = $_REQUEST["email"];
+if (isset($_REQUEST["raaaction"]) && $_REQUEST["raaaction"] == "success") {
+    $raaemail = rcm_e($_REQUEST["email"] ?? "");
     echo "<div class=\"alert alert-success\"><p>" . $LANG["raasuccess"] . " <strong>" . $raaemail . "</strong></p></div>";
 }
 $datetimenow = date("Y-m-d H:i:s");
@@ -23,6 +23,7 @@ $rcmdebuginfo = getDebuginfos();
 $modulename = $rcmdebuginfo["modulename"];
 $debug_addinfo = $rcmdebuginfo["debug_addinfo"];
 if (isset($_POST["multiraaresend"]) && $_POST["multiraaresend"] == "true") {
+    rcm_require_post_token();
     $bulkform = $_POST["bulkform"];
     $bulkcount = 0;
     $successcount = 0;
@@ -36,7 +37,7 @@ if (isset($_POST["multiraaresend"]) && $_POST["multiraaresend"] == "true") {
             $action = "RAA resend verification email";
             $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
             $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $raa_response];
-            logModuleCall($modulename, $action, $requeststring, $responsedata);
+            rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
             if ($raa_response == 1) {
                 $successcount++;
                 $raadata = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodsraa")->where("domain", "=", $bvalue["domain"])->select("count")->get();
@@ -59,11 +60,12 @@ if (isset($_POST["multiraaresend"]) && $_POST["multiraaresend"] == "true") {
         echo "<div class=\"alert alert-success\"><p><strong>" . $successcount . "</strong> " . $LANG["onlyofword"] . " <strong>" . $bulkcount . "</strong> " . $LANG["verifysentsuccess1"] . "</p></div>";
     }
 }
-if (isset($_REQUEST["raaresend"]) && $_REQUEST["raaresend"] == "true") {
-    $orderid = $_REQUEST["orderid"];
-    $raaemail = $_REQUEST["email"];
-    $raadomain = $_REQUEST["dom"];
-    $uid = $_REQUEST["uid"];
+if (isset($_POST["raaresend"]) && $_POST["raaresend"] == "true") {
+    rcm_require_post_token();
+    $orderid = $_POST["orderid"] ?? "";
+    $raaemail = $_POST["email"] ?? "";
+    $raadomain = $_POST["dom"] ?? "";
+    $uid = $_POST["uid"] ?? "";
     $method = "POST";
     $apifunction = "/api/domains/raa/resend-verification.json";
     $data = ["order-id" => $orderid];
@@ -71,7 +73,7 @@ if (isset($_REQUEST["raaresend"]) && $_REQUEST["raaresend"] == "true") {
     $action = "RAA resend verification email";
     $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
     $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $raa_response];
-    logModuleCall($modulename, $action, $requeststring, $responsedata);
+    rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
     if ($raa_response == 1) {
         $raadata = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodsraa")->where("domain", "=", $raadomain)->select("count")->get();
         $count = $raadata[0]->count;
@@ -169,7 +171,7 @@ if (isset($domainsearch[0])) {
         }
         usort($productPages, "sortcompare");
         echo "\r\n\t\t\t<script type=\"text/javascript\">\r\n\t\t\t\$(document).ready(function(){\r\n\t\t\t\$(\"#multicheck\").click(function () {\r\n\t\t\t\t\$(\"#bulktable .checkall\").attr(\"checked\",this.checked);\r\n\t\t\t});\r\n\t\t\t});\r\n\t\t\t</script>\r\n\t\t";
-        echo "<form method=\"post\" action=\"addonmodules.php?module=resellerclubmods_tools&domain=raamanagement&page=" . $page . "\">";
+        echo "<form method=\"post\" action=\"addonmodules.php?module=resellerclubmods_tools&domain=raamanagement&page=" . $page . "\">" . rcm_token_field() . "";
         echo "<input type=\"hidden\" name=\"multiraaresend\" value=\"true\"><table id=\"bulktable\" class=\"datatable\" border=\"0\" cellpadding=\"3\" cellspacing=\"1\" width=\"100%\"><tr>";
         echo "<th><input id=\"multicheck\" type=\"checkbox\" /></th>\r\n\t\t\t  <th>" . $LANG["clienttitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["domainword"] . "</th>\r\n\t\t\t  <th>" . $LANG["raastarttitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["raaendtitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["raaenddaystitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["statusword"] . "</th>\r\n\t\t\t  <th>" . $LANG["regcemailtitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["lastsendtitle"] . "</th>\r\n\t\t\t  <th>" . $LANG["actionword"] . "</th>";
         echo "</tr>";

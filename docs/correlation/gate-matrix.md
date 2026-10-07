@@ -1,7 +1,7 @@
 # Feature Gate Correlation Matrix (Post-OSS)
 
-**Version:** 2.19.1  
-**Updated:** OSS refactor — runtime license gates removed
+**Version:** 2.19.3  
+**Updated:** Security hardening — CLI-only cron; authlogin fail-closed; whois HMAC wid
 
 Cross-reference of feature enablement: config flags, API calls on load, and behavior when prerequisites are missing.
 
@@ -63,8 +63,8 @@ Cross-reference of feature enablement: config flags, API calls on load, and beha
 
 | Component | Gate pattern | Config gates | API calls on run | Blocked when |
 |-----------|--------------|--------------|------------------|--------------|
-| `cron/resellerclubmods_transfercheck.php` | Account setup | Transfer check enabled per account | `search.json`, `details.json` | Invalid/missing account ID |
-| `cron/resellerclubmods_dompricesync.php` | Account setup | Domain sync settings | `customer-price.json` | Sync disabled per account |
+| `cron/resellerclubmods_transfercheck.php` | **CLI-only** (`rcm_deny_direct_http`) | Transfer check enabled per account | `search.json`, `details.json` | HTTP → 403; invalid/missing account ID |
+| `cron/resellerclubmods_dompricesync.php` | **CLI-only** + admin CSRF runner | Domain sync settings | `customer-price.json` | HTTP → 403; sync disabled per account |
 
 ---
 
@@ -73,8 +73,8 @@ Cross-reference of feature enablement: config flags, API calls on load, and beha
 | Component | Gate pattern | Config gates | API calls on load | Blocked when |
 |-----------|--------------|--------------|-------------------|--------------|
 | `widgets/domainpricelist.php` | Always runs | Promo/pricing config | `customer-price.json`, `tlds-in-phase.json` | Missing config |
-| `tools/authlogin.php` | Account setup | `ob_autoauth`, token valid | `authenticate-token-without-history.json` | Invalid token |
-| `tools/whois.php` | `wid` HMAC gate | `wid_key` | `domains/available.json` | Bad/missing wid |
+| `tools/authlogin.php` | Account setup | `ob_autoauth`; **API success + email required** (fail-closed) | `authenticate-token-without-history.json` | ERROR / missing username → home redirect |
+| `tools/whois.php` | HMAC wid (`rcm_whois_wid_expected`) | `wid_key` ≥16 chars, not default | `domains/available.json` | Bad/missing/weak wid |
 
 ---
 

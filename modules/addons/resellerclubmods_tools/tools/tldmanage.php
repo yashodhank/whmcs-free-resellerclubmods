@@ -2,13 +2,17 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
+if (strtoupper((string) ($_SERVER["REQUEST_METHOD"] ?? "GET")) === "POST") {
+    rcm_require_post_token();
+}
+$rcm_tld_batch_limit = 500;
 echo "<script type=\"text/javascript\">// <![CDATA[\r\njQuery(document).ready(function(){\r\n  jQuery(\".scroll\").click(function(event){\r\n    event.preventDefault();\r\n    var offset = jQuery(jQuery(this).attr('href')).offset().top;\r\n    jQuery('html, body').animate({scrollTop:offset}, 1000);\r\n  });\r\n});\r\n// ]]></script>";
 echo $configuredto;
 echo "<a id=\"top\"></a>";
 echo "<h1>" . $LANG["tldmanagetitle"] . "</h1>";
 echo "<p>" . $LANG["tldmanagedesc"] . "</p>";
-echo "\r\n\t<ul><li><a class=\"scroll\" href=\"#tool01\">Tool 1# - " . $LANG["domtools01"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool02\">Tool 2# - " . $LANG["domtools02"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool03\">Tool 3# - " . $LANG["domtools03"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool06\">Tool 4# - " . $LANG["domtools06"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool04\">Tool 5# - " . $LANG["domtools04"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool05\">Tool 6# - " . $LANG["domtools05"] . "</a></li></ul>\r\n\t";
-$registrar_filter = $_POST["reloadregistrar"];
+	echo "\r\n\t<ul><li><a class=\"scroll\" href=\"#tool01\">Tool 1# - " . $LANG["domtools01"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool02\">Tool 2# - " . $LANG["domtools02"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool03\">Tool 3# - " . $LANG["domtools03"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool06\">Tool 4# - " . $LANG["domtools06"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool04\">Tool 5# - " . $LANG["domtools04"] . "</a></li>\r\n\t<li><a class=\"scroll\" href=\"#tool05\">Tool 6# - " . $LANG["domtools05"] . "</a></li></ul>\r\n\t";
+$registrar_filter = $_POST["reloadregistrar"] ?? "";
 if (empty($registrar_filter)) {
     $filtered = $LANG["alldominwhmcstitle"];
     $filteredtld = $LANG["alltldsinwhmcstitle"];
@@ -28,11 +32,12 @@ if (isset($_POST["changeregmodule"]) && $_POST["changeregmodule"] == "true") {
     } else if (empty($_POST["registrar"])) {
         $result01 = "<div class=\"alert alert-danger\"><p>" . $LANG["selectregmoduleerror"] . "</p></div>";
     } else {
-        foreach ($_POST["domainlist"] as $domains) {
+        $domainBatch = array_slice((array) $_POST["domainlist"], 0, $rcm_tld_batch_limit);
+        foreach ($domainBatch as $domains) {
             $update = ["registrar" => $_POST["registrar"]];
             Illuminate\Database\Capsule\Manager::table("tbldomains")->where("domain", "=", $domains)->update($update);
         }
-        $result01 = "<div class=\"alert alert-success\"><p>" . $LANG["changeregmodulesuccess"] . ": <strong>" . $_POST["registrar"] . "</strong></p></div>";
+        $result01 = "<div class=\"alert alert-success\"><p>" . $LANG["changeregmodulesuccess"] . ": <strong>" . rcm_e($_POST["registrar"]) . "</strong></p></div>";
     }
 }
 if (isset($_POST["changeautoregmodule"]) && $_POST["changeautoregmodule"] == "true") {
@@ -41,11 +46,12 @@ if (isset($_POST["changeautoregmodule"]) && $_POST["changeautoregmodule"] == "tr
     } else if (empty($_POST["registrar"])) {
         $result02 = "<div class=\"alert alert-danger\"><p>" . $LANG["selectregmoduleerror"] . "</p></div>";
     } else {
-        foreach ($_POST["tldlist"] as $tlds) {
+        $tldBatch = array_slice((array) $_POST["tldlist"], 0, $rcm_tld_batch_limit);
+        foreach ($tldBatch as $tlds) {
             $update = ["autoreg" => $_POST["registrar"]];
             Illuminate\Database\Capsule\Manager::table("tbldomainpricing")->where("extension", "=", $tlds)->update($update);
         }
-        $result02 = "<div class=\"alert alert-success\"><p>" . $LANG["changetldregmodulesuccess"] . ": <strong>" . $_POST["registrar"] . "</strong></p></div>";
+        $result02 = "<div class=\"alert alert-success\"><p>" . $LANG["changetldregmodulesuccess"] . ": <strong>" . rcm_e($_POST["registrar"]) . "</strong></p></div>";
     }
 }
 $domainslist = $_POST["changetldsaddonslist"];
@@ -310,7 +316,7 @@ if (isset($registrar_filter) && !empty($registrar_filter)) {
 ksort($whmcs_domains);
 ksort($whmcs_domains_tools);
 echo "<div class=\"alert alert-info\">";
-echo "<form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage\">";
+echo "<form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage\">" . rcm_token_field() . "";
 echo "<p><strong>" . $LANG["domainlistfilter"] . "</strong>: " . $LANG["domainlistfilterdesc"] . " <select class=\"form-control\" style=\"display: inline; width: auto\" name=\"reloadregistrar\" onchange=\"submit();\">";
 echo "<option value=\"\"></option>";
 echo "<option value=\"\">" . $LANG["allregmodules"] . "</option>";
@@ -328,7 +334,7 @@ echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-deco
 if ($result01) {
     echo $result01;
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool01\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool01\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"changeregmodule\" value=\"true\">";
 echo "<input type=\"hidden\" name=\"reloadregistrar\" value=\"" . $registrar_filter . "\">";
 echo "<table class=\"table\"><tr><td style=\"vertical-align:top;border-top: none;width:50%;\">";
@@ -355,7 +361,7 @@ echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-deco
 if ($result02) {
     echo $result02;
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool02\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool02\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"changeautoregmodule\" value=\"true\">";
 echo "<input type=\"hidden\" name=\"reloadregistrar\" value=\"" . $registrar_filter . "\">";
 echo "<table class=\"table\"><tr><td style=\"vertical-align:top;border-top: none;width:50%;\">";
@@ -383,7 +389,7 @@ echo "<div class=\"alert alert-warning\"><p>" . $LANG["note"] . " " . $LANG["dom
 if ($result03) {
     echo $result03;
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool03\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool03\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"changemanagetools\" value=\"true\">";
 echo "<input type=\"hidden\" name=\"reloadregistrar\" value=\"" . $registrar_filter . "\">";
 echo "<table class=\"table\"><tr><td style=\"vertical-align:top;border-top: none;width:50%;\">";
@@ -419,7 +425,7 @@ echo "<br /><h3 style=\"border-bottom: 1px solid #cccccc;\"><a style=\"text-deco
 if ($result06) {
     echo $result06;
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool06\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool06\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"changetldsaddons\" value=\"true\">";
 echo "<input type=\"hidden\" name=\"reloadregistrar\" value=\"" . $registrar_filter . "\">";
 echo "<table class=\"table\"><tr><td style=\"vertical-align:top;border-top: none;width:50%;\">";
@@ -468,7 +474,7 @@ if (!empty($_POST["customrecurringprice"])) {
 if (!empty($_POST["excluderecurring"])) {
     $excluderecurring = $_POST["excluderecurring"];
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool04\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool04\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"priceupdatetool\" value=\"true\">";
 echo "<p><strong>" . $LANG["newrecurrprice"] . ":</strong>&nbsp;";
 echo "<input class=\"form-control input-100\" style=\"display: inline;\" name=\"customrecurringprice\" size=\"10\" value=\"" . $postrecurring . "\" type=\"text\">&nbsp;&nbsp;";
@@ -526,7 +532,7 @@ echo "<div class=\"alert alert-info\"><p>" . $LANG["tooltitle05desc1"] . "</p><p
 if ($result05) {
     echo $result05;
 }
-echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool05\">";
+echo "<div><form method=\"post\" action=\"" . $_SERVER["PHP_SELF"] . "?module=resellerclubmods_tools&domain=tldmanage#tool05\">" . rcm_token_field() . "";
 echo "<input type=\"hidden\" name=\"sorttlds\" value=\"true\">";
 echo "<p><input type=\"submit\" value=\"" . $LANG["sortorderbutton"] . "\" class=\"btn btn-success\" /></p></td>";
 echo "</form></div></div><br /><br />";

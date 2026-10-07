@@ -361,17 +361,17 @@ $price_details = $_GET["details"];
                     } else {
                         $apifunction = "/api/products/customer-price.json";
                         $data = "";
-                        if (empty($_SESSION["rcm_get_restorepricing"]["clientarea"])) {
+                        if ((rcm_session_cache_get("rcm_get_restorepricing.clientarea") === null)) {
                             $get_restorepricing = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                            $_SESSION["rcm_get_restorepricing"]["clientarea"] = serialize($get_restorepricing);
+                            rcm_session_cache_set("rcm_get_restorepricing.clientarea", $get_restorepricing);
                         } else {
-                            $get_restorepricing = unserialize($_SESSION["rcm_get_restorepricing"]["clientarea"]);
+                            $get_restorepricing = rcm_session_cache_get("rcm_get_restorepricing.clientarea");
                         }
-                        if (empty($_SESSION["rcm_productkeys"]["clientarea"])) {
+                        if ((rcm_session_cache_get("rcm_productkeys.clientarea") === null)) {
                             $productkeys = newproductkeys($rcauth_userid, $rcauth_password, $rchttp_api);
-                            $_SESSION["rcm_productkeys"]["clientarea"] = serialize($productkeys);
+                            rcm_session_cache_set("rcm_productkeys.clientarea", $productkeys);
                         } else {
-                            $productkeys = unserialize($_SESSION["rcm_productkeys"]["clientarea"]);
+                            $productkeys = rcm_session_cache_get("rcm_productkeys.clientarea");
                         }
                         foreach ($productkeys as $productkey => $productvalue) {
                             foreach ($get_restorepricing as $key => $value) {
@@ -396,11 +396,11 @@ $price_details = $_GET["details"];
                 if ($show_prega_label == "on" && !isset($price_details)) {
                     $apifunction = "/api/domains/tlds-in-phase.json";
                     $data = ["phase" => "prega"];
-                    if (empty($_SESSION["rcm_get_pregatlds"]["clientarea"])) {
+                    if ((rcm_session_cache_get("rcm_get_pregatlds.clientarea") === null)) {
                         $get_pregatlds = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-                        $_SESSION["rcm_get_pregatlds"]["clientarea"] = serialize($get_pregatlds);
+                        rcm_session_cache_set("rcm_get_pregatlds.clientarea", $get_pregatlds);
                     } else {
-                        $get_pregatlds = unserialize($_SESSION["rcm_get_pregatlds"]["clientarea"]);
+                        $get_pregatlds = rcm_session_cache_get("rcm_get_pregatlds.clientarea");
                     }
                 }
                 if ($whmcs_style == "Six") {
