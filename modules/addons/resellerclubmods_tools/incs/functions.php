@@ -2,8 +2,9 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
-$releasedate = "2026-09-01";
-$softversion = "2.19.2";
+$releasedate = "2026-10-07";
+$softversion = "2.19.3";
+require_once __DIR__ . "/security.php";
 if (!function_exists("utf8_encode")) {
     function utf8_encode($string)
     {
@@ -472,17 +473,26 @@ if (!function_exists("createOBcustomer")) {
         $apifunction = "/api/customers/v2/signup.json";
         $data = ["username" => $userName, "passwd" => $passwd, "name" => $name, "company" => $company, "address-line-1" => $address1, "address-line-2" => $address2, "address-line-3" => $address3, "city" => $city, "state" => $stateName, "country" => $country, "zipcode" => $zip, "phone-cc" => $telNoCc, "phone" => $telNo, "alt-phone-cc" => $altTelNoCc, "alt-phone" => $altTelNo, "fax-cc" => $faxNoCc, "fax" => $faxNo, "mobile-cc" => $mobileNoCc, "mobile" => $mobileNo, "lang-pref" => $langPref];
         $signup_rc_customer_id = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
-        $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
-        $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $signup_rc_customer_id];
-        logModuleCall($modulename, $action, $requeststring, $responsedata);
+        $requeststring = $apifunction . " [reseller data protected] " . serialize_data(rcm_redact_for_log($data));
+        $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => rcm_redact_for_log($signup_rc_customer_id)];
+        rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
         return $signup_rc_customer_id;
     }
 }
 if (!function_exists("call_api")) {
-    function call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method)
+    function call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data = [], $method = "GET")
     {
-        $data = "auth-userid=" . $rcauth_userid . "&api-key=" . rawurlencode($rcauth_password) . serialize_data($data);
+        if (!is_array($data)) {
+            $data = [];
+        }
+        if ($method === null || $method === "") {
+            $method = "GET";
+        }
+        $payload = "auth-userid=" . $rcauth_userid . "&api-key=" . rawurlencode($rcauth_password) . serialize_data($data);
         $ch = curl_init();
+        if ($ch === false) {
+            return ["status" => "ERROR", "message" => "curl_init failed", "error" => "curl_init"];
+        }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
@@ -493,13 +503,22 @@ if (!function_exists("call_api")) {
         if ($method == "POST") {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_URL, $rchttp_api . $apifunction);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         } else {
-            curl_setopt($ch, CURLOPT_URL, $rchttp_api . $apifunction . "?" . $data);
+            curl_setopt($ch, CURLOPT_URL, $rchttp_api . $apifunction . "?" . $payload);
         }
-        $result = curl_exec($ch);
-        $result = json_decode($result, true);
+        $raw = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $err = curl_error($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        if ($raw === false || $errno) {
+            return ["status" => "ERROR", "message" => $err !== "" ? $err : "curl request failed", "error" => "curl", "http_code" => $httpCode];
+        }
+        $result = json_decode($raw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ["status" => "ERROR", "message" => "invalid JSON response", "error" => "json", "http_code" => $httpCode];
+        }
         return $result;
     }
 }
