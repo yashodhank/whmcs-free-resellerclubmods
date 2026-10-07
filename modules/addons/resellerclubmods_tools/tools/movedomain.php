@@ -207,7 +207,7 @@ if ($_REQUEST["movesearch"] == "true") {
     $action = "Move Domain/Service";
     $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
     $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $moveXml];
-    logModuleCall($modulename, $action, $requeststring, $responsedata);
+    rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
     $movesuccess = "<div class=\"alert alert-success\"><p>" . $LANG["domainmovedsuccesfully"] . "</p></div>";
     $moveerror = "<div class=\"alert alert-danger\"><p>" . $moveXml["message"] . "</p></div>";
     $custcreateerror = "<div class=\"alert alert-danger\"><p>" . $errormessage . "</p></div>";

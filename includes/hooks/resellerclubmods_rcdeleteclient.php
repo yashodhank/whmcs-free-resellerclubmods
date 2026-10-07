@@ -38,7 +38,7 @@ function delete_rc_account($vars)
                     $action = "Delete Customer";
                     $requeststring = $apifunction . " [reseller data protected] " . serialize_data($data);
                     $responsedata = ["rcmdebug" => $debug_addinfo, "apidebug" => $response_customerdelete];
-                    logModuleCall($modulename, $action, $requeststring, $responsedata);
+                    rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
                     if ($response_customerdelete == "true") {
                         logActivity("Customer successfully deleted at " . $logicbox_registrar . " (" . $rcauth_userid . ") - User: " . $email);
                     } else {

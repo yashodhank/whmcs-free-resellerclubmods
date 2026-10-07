@@ -1,8 +1,5 @@
 <?php
-if (!defined("RCM_GLOBAL_ACCESS_KEY")) {
-    define("RCM_GLOBAL_ACCESS_KEY", "%bubimanual%");
-}
-if (!defined("WHMCS") && PHP_SAPI !== "cli" && (!isset($_POST["rcm_pass"]) || $_POST["rcm_pass"] !== RCM_GLOBAL_ACCESS_KEY) && !isset($_REQUEST["coreorigin"])) {
+if (!defined("WHMCS") && PHP_SAPI !== "cli") {
     exit("This file cannot be accessed directly");
 }
 $whmcs_root_dir = realpath(dirname(__FILE__) . "/../../../");
@@ -51,10 +48,10 @@ function resellerclubmods_tools_output($vars)
     $tblconf = [];
     try {
         foreach (Illuminate\Database\Capsule\Manager::table("tblconfiguration")->get() as $tblconfvars) {
-            $tblconf[$tblconf->setting] = $tblconf->value;
+            $tblconf[$tblconfvars->setting] = $tblconfvars->value;
         }
     } catch (Exception $e) {
-        echo "<div class=\"alert alert-danger\">" . $e->getMessage() . "</div>";
+        echo "<div class=\"alert alert-danger\">" . rcm_e($e->getMessage()) . "</div>";
     }
     try {
         $tblregistrars = [];
@@ -73,63 +70,65 @@ function resellerclubmods_tools_output($vars)
     $style_promolabel = "class=\"label active\" style=\"cursor:pointer;\"";
     $LANG = $vars["_lang"];
     if (isset($_POST["changeaccount"]) && $_POST["changeaccount"] == "true") {
+        rcm_require_post_token();
         unset($_SESSION["rcm_domain_customer_import_array"]);
         $table = "mod_resellerclubmodstools";
         if (is_numeric($_POST["account_number"]) && $_POST["account_number"] == 1) {
             $rcauth_userid = $vars["first_rcauth_userid"];
-            $rcauth_password = $vars["first_rcauth_apikey"];
             $logicbox_registrar = $vars["first_domainregistrar"];
             $defaultcurrency = $vars["first_defaultcurrency"];
             $currencyswitch = $vars["first_currencyswitch"];
             $multiplicator = (float) $vars["first_multiplicator"];
             $account_name = $vars["first_acc_name"];
             $account_number = 1;
-            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
+            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => "", "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
             $result_update = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->update($values);
-            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . $account_name . "</strong></p></div>";
+            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . rcm_e($account_name) . "</strong></p></div>";
         } else if (is_numeric($_POST["account_number"]) && $_POST["account_number"] == 2) {
             $rcauth_userid = $vars["second_rcauth_userid"];
-            $rcauth_password = $vars["second_rcauth_apikey"];
             $logicbox_registrar = $vars["second_domainregistrar"];
             $defaultcurrency = $vars["second_defaultcurrency"];
             $currencyswitch = $vars["second_currencyswitch"];
             $multiplicator = (float) $vars["second_multiplicator"];
             $account_name = $vars["second_acc_name"];
             $account_number = 2;
-            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
+            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => "", "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
             $result_update = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->update($values);
-            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . $account_name . "</strong></p></div>";
+            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . rcm_e($account_name) . "</strong></p></div>";
         } else if (is_numeric($_POST["account_number"]) && $_POST["account_number"] == 3) {
             $rcauth_userid = $vars["third_rcauth_userid"];
-            $rcauth_password = $vars["third_rcauth_apikey"];
             $logicbox_registrar = $vars["third_domainregistrar"];
             $defaultcurrency = $vars["third_defaultcurrency"];
             $currencyswitch = $vars["third_currencyswitch"];
             $multiplicator = (float) $vars["third_multiplicator"];
             $account_name = $vars["third_acc_name"];
             $account_number = 3;
-            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
+            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => "", "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
             $result_update = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->update($values);
-            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . $account_name . "</strong></p></div>";
+            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . rcm_e($account_name) . "</strong></p></div>";
         } else if (is_numeric($_POST["account_number"]) && $_POST["account_number"] == 4) {
             $rcauth_userid = $vars["fourth_rcauth_userid"];
-            $rcauth_password = $vars["fourth_rcauth_apikey"];
             $logicbox_registrar = $vars["fourth_domainregistrar"];
             $defaultcurrency = $vars["fourth_defaultcurrency"];
             $currencyswitch = $vars["fourth_currencyswitch"];
             $multiplicator = (float) $vars["fourth_multiplicator"];
             $account_name = $vars["fourth_acc_name"];
             $account_number = 4;
-            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => $rcauth_password, "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
+            $values = ["account_name" => $account_name, "account_number" => $account_number, "rcauth_userid" => $rcauth_userid, "rcauth_password" => "", "logicbox_registrar" => $logicbox_registrar, "defaultcurrency" => $defaultcurrency, "currencyswitch" => $currencyswitch, "multiplicator" => $multiplicator];
             $result_update = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->update($values);
-            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . $account_name . "</strong></p></div>";
+            echo "<div class=\"alert alert-success\"><p>" . $LANG["changeaccountsuccess"] . " <strong>" . rcm_e($account_name) . "</strong></p></div>";
         } else {
             echo "<div class=\"alert alert-danger\"><p>" . $LANG["changeaccountinfo"] . "</p></div>";
         }
     }
     $result = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->select()->get();
     $rcauth_userid = $result[0]->rcauth_userid;
-    $rcauth_password = $result[0]->rcauth_password;
+    $account_number = $result[0]->account_number;
+    $rcauth_password = rcm_account_apikey($account_number, $vars);
+    if ($rcauth_password === "" && !empty($result[0]->rcauth_password)) {
+        // Legacy rows may still hold a copy until the next account switch clears it.
+        $rcauth_password = $result[0]->rcauth_password;
+    }
     $rchttp_api = $result[0]->rchttp_api;
     $logicbox_registrar = $result[0]->logicbox_registrar;
     $defaultcurrency = $result[0]->defaultcurrency;
@@ -248,6 +247,7 @@ function resellerclubmods_tools_output($vars)
     }
     $method = "GET";
     $apifunction = "/api/resellers/details.json";
+    $data = ["reseller-id" => $rcauth_userid];
     $resellerdetails_arrXml = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
     $reseller_buycurrency = $resellerdetails_arrXml["parentsellingcurrencysymbol"];
     $is_mplicator = 1;
@@ -281,12 +281,20 @@ function resellerclubmods_tools_output($vars)
     foreach ($selectorarray as $key => $value) {
         $selectoptions .= "<option value=\"" . $key . "\">" . $value . "</option>";
     }
-    $tools_change_acc_dropdown = "\r\n\t\t\t<form class=\"form-inline\" action=\"" . $_SERVER["REQUEST_URI"] . "\" method=\"post\">\r\n\t\t\t<select class=\"form-control input-sm\" name=\"account_number\" onchange=\"submit();\" style=\"padding: 0;\">\r\n\t\t\t<option value=\"\">" . $LANG["changercacc"] . "</option>\r\n\t\t\t" . $selectoptions . "\r\n\t\t\t</select>&nbsp;<img class=\"absmiddle\" style=\"cursor:help;\" src=\"../modules/addons/resellerclubmods_tools/img/help.png\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"" . $LANG["changeaccountnote"] . "\" height=\"16\" width=\"16\" />\r\n\t\t\t<input type=\"hidden\" name=\"changeaccount\" value=\"true\" />\r\n\t\t\t</form>";
+    $tools_change_acc_dropdown = "\r\n\t\t\t<form class=\"form-inline\" action=\"" . rcm_e($_SERVER["REQUEST_URI"]) . "\" method=\"post\">\r\n\t\t\t" . rcm_token_field() . "\r\n\t\t\t<select class=\"form-control input-sm\" name=\"account_number\" onchange=\"submit();\" style=\"padding: 0;\">\r\n\t\t\t<option value=\"\">" . $LANG["changercacc"] . "</option>\r\n\t\t\t" . $selectoptions . "\r\n\t\t\t</select>&nbsp;<img class=\"absmiddle\" style=\"cursor:help;\" src=\"../modules/addons/resellerclubmods_tools/img/help.png\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"" . $LANG["changeaccountnote"] . "\" height=\"16\" width=\"16\" />\r\n\t\t\t<input type=\"hidden\" name=\"changeaccount\" value=\"true\" />\r\n\t\t\t</form>";
     $configuredto = "\r\n\t\t\t<div style=\"float:left;padding:5px;width:auto;font-size:13px\"><strong>" . $LANG["configuredto"] . "</strong> " . $account_name . " - <strong>" . $LANG["lbtitle"] . "</strong> <span " . $style_label . ">" . $logicbox_registrar . "</span> - <strong>ID:</strong> " . $rcauth_userid . "</div>\r\n\t\t\t<div style=\"float:left;padding:0px;width:auto;font-size:13px\">" . $tools_change_acc_dropdown . "</div>\r\n\t\t\t<div></div><br />\r\n\t\t\t<div style=\"border-bottom:1px solid #cccccc;margin-top:10px;padding-top:10px;\"></div><br />";
     if ($_GET["trans"] == "showfunds") {
         include ROOTDIR . "/modules/addons/resellerclubmods_tools/tools/fundsbalance.php";
     } else if ($_GET["domain"] == "domain-pricing-import") {
         require ROOTDIR . "/includes/currencyfunctions.php";
+        if (isset($_POST["dobulkupdate"]) || isset($_POST["dobulksetupimport"])) {
+            rcm_require_post_token();
+            $conf = rcm_load_addon_conf();
+            $rid = $rcauth_userid;
+            // Admin bulk price sync — never via public cron HTTP.
+            require ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/runners/dompricesync_runner.php";
+            return;
+        }
         include ROOTDIR . "/modules/addons/resellerclubmods_tools/tools/importdompricing.php";
     } else if ($_GET["domain"] == "domainimport") {
         include ROOTDIR . "/modules/addons/resellerclubmods_tools/tools/importdomains.php";
@@ -391,7 +399,7 @@ function resellerclubmods_tools_config()
         $result = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->select("account_number")->get();
         $tools_account_number = $result[0]->account_number;
         if (empty($tools_account_number)) {
-            $values = ["account_name" => $first_account_name, "account_number" => $first_account_number, "rcauth_userid" => $first_rcauth_userid, "rcauth_password" => $first_rcauth_password, "rchttp_api" => $conf_rchttp_api, "logicbox_registrar" => $first_logicbox_registrar, "defaultcurrency" => $first_defaultcurrency, "currencyswitch" => $first_currencyswitch, "multiplicator" => $first_multiplicator];
+            $values = ["account_name" => $first_account_name, "account_number" => $first_account_number, "rcauth_userid" => $first_rcauth_userid, "rcauth_password" => "", "rchttp_api" => $conf_rchttp_api, "logicbox_registrar" => $first_logicbox_registrar, "defaultcurrency" => $first_defaultcurrency, "currencyswitch" => $first_currencyswitch, "multiplicator" => $first_multiplicator];
             $result = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->insert($values);
         }
     }
@@ -499,7 +507,7 @@ function resellerclubmods_tools_config()
     if ($is_adminlang != $tool_default_lang && file_exists(ROOTDIR . "/modules/addons/resellerclubmods_tools/lang/" . $is_adminlang . ".php")) {
         $tool_default_lang = $is_adminlang;
     }
-    $configarray = ["name" => "RC & LB Tools v2", "version" => "2.19.2", "author" => "<img src=\"../modules/addons/resellerclubmods_tools/img/rcmini.png\" alt=\"Resellerclub Mods RC & LB Tools v2\" title=\"Resellerclub Mods RC & LB Tools v2\"/>", "language" => $tool_default_lang, "description" => "<a id=\"top\"></a>This module shows your ResellerClub & LogicBoxes funds account balance on your admin home page and offers a set with other useful management tools for your Reseller account (MIT open source).", "fields" => $merged];
+    $configarray = ["name" => "RC & LB Tools v2", "version" => "2.19.3", "author" => "<img src=\"../modules/addons/resellerclubmods_tools/img/rcmini.png\" alt=\"Resellerclub Mods RC & LB Tools v2\" title=\"Resellerclub Mods RC & LB Tools v2\"/>", "language" => $tool_default_lang, "description" => "<a id=\"top\"></a>This module shows your ResellerClub & LogicBoxes funds account balance on your admin home page and offers a set with other useful management tools for your Reseller account (MIT open source).", "fields" => $merged];
     return $configarray;
 }
 function resellerclubmods_tools_activate()
@@ -642,6 +650,45 @@ function resellerclubmods_tools_upgrade($vars)
             });
         } catch (Exception $e) {
             echo (string) $e->getMessage();
+        }
+    }
+    if (version_compare((string) $version, "2.19.3", "<")) {
+        try {
+            // Clear denormalized API key copies (secrets live in tbladdonmodules only).
+            Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodstools")->update(["rcauth_password" => ""]);
+        } catch (Exception $e) {
+            // non-fatal
+        }
+        try {
+            $schema = Illuminate\Database\Capsule\Manager::schema();
+            if ($schema->hasTable("mod_resellerclubmodsfunds")) {
+                $schema->table("mod_resellerclubmodsfunds", function ($table) {
+                    $sm = Illuminate\Database\Capsule\Manager::schema();
+                    // Unique reseller_id when index missing (idempotent best-effort).
+                    try {
+                        $table->unique("reseller_id", "rcm_funds_reseller_id_unique");
+                    } catch (Exception $e) {
+                    }
+                });
+            }
+            if ($schema->hasTable("mod_resellerclubmodspromo")) {
+                $schema->table("mod_resellerclubmodspromo", function ($table) {
+                    try {
+                        $table->index(["relid", "type"], "rcm_promo_relid_type_idx");
+                    } catch (Exception $e) {
+                    }
+                });
+            }
+            if ($schema->hasTable("mod_resellerclubmodsraa")) {
+                $schema->table("mod_resellerclubmodsraa", function ($table) {
+                    try {
+                        $table->index("domain", "rcm_raa_domain_idx");
+                    } catch (Exception $e) {
+                    }
+                });
+            }
+        } catch (Exception $e) {
+            // index already exists or engine limitation — non-fatal
         }
     }
 }
