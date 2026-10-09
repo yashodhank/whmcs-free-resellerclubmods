@@ -75,6 +75,27 @@ else
   echo "OK: automationtools CLI-only"
 fi
 
+echo "== Deny: stale GET Method in optionflagsdesc0 (NP-001) =="
+if rcm_search_n 'optionflagsdesc0.*GET Method|optionflagsdesc0.*método GET' modules/addons/resellerclubmods_tools/lang; then
+  echo "FAIL: optionflagsdesc0 still advertises HTTP GET cron"
+  fail=1
+else
+  echo "OK: optionflagsdesc0 CLI-only"
+fi
+
+echo "== Require: flock helpers (NP-002/NP-003) =="
+if rcm_search_q 'function rcm_try_lock|function rcm_release_lock' modules/addons/resellerclubmods_tools/incs/security.php \
+   && rcm_search_q 'rcm_try_lock\("dompricesync"\)' modules/addons/resellerclubmods_tools/incs/runners/dompricesync_runner.php \
+   && rcm_search_q 'rcm_try_lock\("dailycron_hooks"\)' includes/hooks/resellerclubmods_domainrecurring.php \
+      includes/hooks/resellerclubmods_promoactivate.php \
+      includes/hooks/resellerclubmods_promoupdate.php \
+      includes/hooks/resellerclubmods_raadomainreport.php; then
+  echo "OK: price-sync + DailyCronJob skip-if-busy locks present"
+else
+  echo "FAIL: missing rcm_try_lock usage"
+  fail=1
+fi
+
 echo "== Require: cron deny helper =="
 for c in modules/addons/resellerclubmods_tools/cron/resellerclubmods_dompricesync.php \
          modules/addons/resellerclubmods_tools/cron/resellerclubmods_transfercheck.php; do
@@ -106,11 +127,11 @@ else
 fi
 
 echo "== Version =="
-if rcm_search_q '\$softversion = "2\.19\.3"' modules/addons/resellerclubmods_tools/incs/functions.php \
-   && rcm_search_q '"version" => "2\.19\.3"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php; then
-  echo "OK: version 2.19.3"
+if rcm_search_q '\$softversion = "2\.19\.4"' modules/addons/resellerclubmods_tools/incs/functions.php \
+   && rcm_search_q '"version" => "2\.19\.4"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php; then
+  echo "OK: version 2.19.4"
 else
-  echo "FAIL: version not 2.19.3"
+  echo "FAIL: version not 2.19.4"
   fail=1
 fi
 
