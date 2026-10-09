@@ -72,10 +72,11 @@ if ($CONFIG["domainLookupProvider"] != "WhmcsWhois" && $CONFIG["domainLookupProv
                         if ($whslist["uri"] != $reseller_whoisurl) {
                             $widchange = "0";
                             $array_key = $key;
+                            // PHP 8+: implode() requires array (empty extensions must not become "").
                             if (!empty($whslist["extensions"])) {
-                                $tlds_array = explode(",", $whslist["extensions"]);
+                                $tlds_array = explode(",", (string) $whslist["extensions"]);
                             } else {
-                                $tlds_array = "";
+                                $tlds_array = [];
                             }
                         }
                     }
