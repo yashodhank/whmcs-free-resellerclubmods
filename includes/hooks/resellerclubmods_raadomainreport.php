@@ -18,6 +18,12 @@ function raa_domain_report($vars)
     $conf_arr[$conf["second_rcauth_userid"]] = [$conf["second_rcauth_userid"], $conf["second_rcauth_apikey"], $conf["second_domainregistrar"]];
     $conf_arr[$conf["third_rcauth_userid"]] = [$conf["third_rcauth_userid"], $conf["third_rcauth_apikey"], $conf["third_domainregistrar"]];
     $conf_arr[$conf["fourth_rcauth_userid"]] = [$conf["fourth_rcauth_userid"], $conf["fourth_rcauth_apikey"], $conf["fourth_domainregistrar"]];
+    $rcm_daily_lock = rcm_try_lock("dailycron_hooks");
+    if ($rcm_daily_lock === false) {
+        logActivity("Cron Job (RCM): Skipping RAA domain report — daily hooks busy");
+        return;
+    }
+    try {
             if (!class_exists("idna_convert")) {
             require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/idnclass.php";
         }
@@ -105,6 +111,9 @@ function raa_domain_report($vars)
                 adminemailmessages($mailtpltype, $mailsubject, $mailmessage, $apiadminuser);
             }
         }
+    } finally {
+        rcm_release_lock($rcm_daily_lock);
+    }
 }
 
 ?>

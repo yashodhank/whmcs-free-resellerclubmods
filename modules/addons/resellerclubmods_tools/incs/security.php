@@ -327,3 +327,60 @@ if (!function_exists("rcm_safe_relative_goto")) {
         return $destination;
     }
 }
+
+if (!function_exists("rcm_try_lock")) {
+    /**
+     * Non-blocking exclusive flock (skip-if-busy).
+     * Lock file under ROOTDIR/storage (preferred), else attachments, else sys temp.
+     * Returns: open file handle on success; null if lock file cannot be created
+     * (degraded proceed without exclusion); false if another process holds the lock
+     * (caller should skip). Caller must rcm_release_lock($fh) when not false.
+     *
+     * Behavior (NP-002 / NP-003): overlapping cron/admin sync or a second DailyCronJob
+     * process skips rather than double-writing tblpricing or stacking LB API calls.
+     */
+    function rcm_try_lock($name)
+    {
+        $safe = preg_replace("/[^a-zA-Z0-9_-]/", "", (string) $name);
+        if ($safe === "") {
+            return null;
+        }
+        $dir = sys_get_temp_dir();
+        if (defined("ROOTDIR")) {
+            if (is_dir(ROOTDIR . "/storage") && is_writable(ROOTDIR . "/storage")) {
+                $dir = ROOTDIR . "/storage";
+            } elseif (is_dir(ROOTDIR . "/attachments") && is_writable(ROOTDIR . "/attachments")) {
+                $dir = ROOTDIR . "/attachments";
+            }
+        }
+        $path = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . "rcm_" . $safe . ".lock";
+        $fh = @fopen($path, "c+");
+        if ($fh === false) {
+            return null;
+        }
+        if (!flock($fh, LOCK_EX | LOCK_NB)) {
+            fclose($fh);
+            return false;
+        }
+        ftruncate($fh, 0);
+        fwrite($fh, (string) getmypid() . "\n");
+        fflush($fh);
+        return $fh;
+    }
+}
+
+if (!function_exists("rcm_release_lock")) {
+    /**
+     * Release a handle from rcm_try_lock(). Safe to call with false/null.
+     */
+    function rcm_release_lock($fh)
+    {
+        if ($fh === false || $fh === null) {
+            return;
+        }
+        if (is_resource($fh)) {
+            @flock($fh, LOCK_UN);
+            @fclose($fh);
+        }
+    }
+}

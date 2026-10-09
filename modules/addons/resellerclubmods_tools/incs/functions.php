@@ -2,8 +2,8 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
-$releasedate = "2026-10-07";
-$softversion = "2.19.3";
+$releasedate = "2026-10-09";
+$softversion = "2.19.4";
 require_once __DIR__ . "/security.php";
 if (!function_exists("utf8_encode")) {
     function utf8_encode($string)

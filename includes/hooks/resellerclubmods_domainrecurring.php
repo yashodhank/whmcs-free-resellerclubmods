@@ -10,6 +10,13 @@ function recurring_domain_update($vars)
     $maileradmin = $conf["maileradmin"] ?? "";
     $update_domain_recurring = $conf["update_domain_recurring"] ?? "";
     if ($update_domain_recurring == "on") {
+        // NP-003: skip if another DailyCronJob process still holds the shared RCM daily lock.
+        $rcm_daily_lock = rcm_try_lock("dailycron_hooks");
+        if ($rcm_daily_lock === false) {
+            logActivity("Cron Job (RCM): Skipping Update Domain recurring prices — daily hooks busy");
+            return;
+        }
+        try {
         $rcmdebuginfo = getDebuginfos();
         $modulename = $rcmdebuginfo["modulename"];
         $debug_addinfo = $rcmdebuginfo["debug_addinfo"];
@@ -103,6 +110,9 @@ function recurring_domain_update($vars)
         $requeststring = "sqlqueries";
         $responsedata = ["rcmdebug" => $debug_addinfo, "sqlresults" => $recurringprice_array];
         rcm_log_module_call($modulename, $action, $requeststring, $responsedata);
+        } finally {
+            rcm_release_lock($rcm_daily_lock);
+        }
     } else {
         logActivity("Cron Job (RCM): Skipping Update Domain recurring prices");
     }

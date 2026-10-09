@@ -1,4 +1,4 @@
-# AGENTS.md — RC & LB Tools v2.19.3
+# AGENTS.md — RC & LB Tools v2.19.4
 
 AI agent entry point for **FREE Resellerclub & LogicBoxes Tools** (WHMCS addon). Read this file before investigating or suggesting changes to this repository.
 
@@ -17,8 +17,8 @@ AI agent entry point for **FREE Resellerclub & LogicBoxes Tools** (WHMCS addon).
 |-------|-------|
 | Module name | `resellerclubmods_tools` |
 | Display name | RC & LB Tools v2 |
-| Version | **2.19.3** |
-| Release date | 2026-10-07 (`incs/functions.php`) |
+| Version | **2.19.4** |
+| Release date | 2026-10-09 (`incs/functions.php`) |
 | PHP | 7.4–8.4 (CI matrix in `.github/workflows/php-compat.yml`) |
 | WHMCS | 8.x / 9.x |
 | Repository license | MIT ([LICENSE](LICENSE)) |

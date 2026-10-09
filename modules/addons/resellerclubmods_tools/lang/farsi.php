@@ -895,7 +895,7 @@ $_ADDONLANG['updaterecurringmessage'] = "Additionally, recurring pricing have be
 $_ADDONLANG['apichachetitle'] = "API Data Cached";
 $_ADDONLANG['apichachereload'] = "Reload API Data";
 $_ADDONLANG['apichachedesc'] = "All retrieved data are cached automatically with the first access. In order to retrieve fresh data, click the button below. You will need to do this if you change your selling prices or if you enable new TLDs in your reseller account";
-$_ADDONLANG['optionflagsdesc0'] = "In order to pass variables with the php -q Method (php cli) you need to have the php directive register_argc_argv set to &quot;On&quot; in the php configuration file php.ini. If your hosting provider does not allow this then you need to use the GET Method instead.";
+$_ADDONLANG['optionflagsdesc0'] = "Cron price sync and transfer-check scripts are CLI-only (<code>php -q</code>). Ensure <code>register_argc_argv</code> is On in php.ini so reseller ID CLI arguments are passed. HTTP GET/lynx/wget against <code>cron/*.php</code> is not supported and returns 403. Use the CLI recipes on this page, or run bulk price sync from the admin Domain Pricing tool (CSRF-protected).";
 
 # 2.9.3
 

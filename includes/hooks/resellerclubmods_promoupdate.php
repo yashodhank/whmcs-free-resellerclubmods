@@ -25,6 +25,12 @@ function promo_update_price($vars)
         }
     }
     if ($promo_end_check == "on") {
+        $rcm_daily_lock = rcm_try_lock("dailycron_hooks");
+        if ($rcm_daily_lock === false) {
+            logActivity("Cron Job (RCM): Skipping Auto Promo Update Check — daily hooks busy");
+            return;
+        }
+        try {
         if (0 <= version_compare(getWver(), "7.0.0")) {
             $is_v7 = 1;
         }
@@ -149,6 +155,9 @@ function promo_update_price($vars)
             adminemailmessages($mailtpltype, $mailsubject, $mailmessage, $apiadminuser);
         } else {
             logActivity("Cron Job: (RCM) " . $LANG["promoupdatetitle"] . " " . $LANG["nopromoactive"]);
+        }
+        } finally {
+            rcm_release_lock($rcm_daily_lock);
         }
     } else {
         logActivity("Cron Job (RCM): Skipping Auto Promo Update Check");

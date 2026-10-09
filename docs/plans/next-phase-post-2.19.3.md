@@ -1,6 +1,6 @@
 # Next phase after RC & LB Tools v2.19.3 (prod-verified)
 
-**Status:** Proposed backlog (not started)  
+**Status:** P1 in progress for **2.19.4** (NP-001/002/003 + version bump)  
 **Base:** `main` @ 2.19.3 (MIT OSS hardening complete; prod smoke 2026-10-09)  
 **Does not replace:** `AUDIT-REPORT.md` residual risks — this amends them with runtime findings.
 
@@ -28,9 +28,9 @@
 
 | ID | Priority | Why | Paths |
 |----|----------|-----|-------|
-| NP-001 | P1 | Stale Automation Tools yellow note still says use **GET Method** if `register_argc_argv` off — contradicts CLI-only red banner and confuses operators | `lang/*/optionflagsdesc0`, English source used by `tools/automationtools.php` |
-| NP-002 | P1 | Price sync can leave partial `tblpricing` writes on interrupt; no lock | `incs/runners/dompricesync_runner.php`, admin import path in `tools/importdompricing.php` |
-| NP-003 | P1 | DailyCronJob pile-up (recurring → promo → RAA) shares LB quota with no mutual exclusion | `includes/hooks/resellerclubmods_*.php`, promo/RAA hooks |
+| NP-001 | P1 ✓ 2.19.4 | Stale Automation Tools yellow note still says use **GET Method** if `register_argc_argv` off — contradicts CLI-only red banner and confuses operators | `lang/*/optionflagsdesc0`, English source used by `tools/automationtools.php` |
+| NP-002 | P1 ✓ 2.19.4 | Price sync can leave partial `tblpricing` writes on interrupt; no lock → **skip-if-busy flock** `rcm_try_lock("dompricesync")` (does not make interrupt atomic; prevents overlapping writers) | `incs/runners/dompricesync_runner.php`, `incs/security.php` |
+| NP-003 | P1 ✓ 2.19.4 | DailyCronJob pile-up (recurring → promo → RAA) shares LB quota with no mutual exclusion → **skip-if-busy** shared `dailycron_hooks` lock across concurrent cron processes (sequential same-process hooks still run one after another) | `includes/hooks/resellerclubmods_{domainrecurring,promoactivate,promoupdate,raadomainreport}.php` |
 | NP-004 | P2 | Whois GUI cannot persist when `whois.json` missing / non-writable; fail clearer + optional seed from `dist.whois.json` | `tools/guiwhois.php` / `tools/gui7whois.php`, overlay bake |
 | NP-005 | P2 | Whois still burns LB API quota; no rate limit | `tools/whois.php`, `incs/security.php` |
 

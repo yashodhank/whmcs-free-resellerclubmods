@@ -64,6 +64,16 @@ if (!defined("WHMCS")) {
         }
     }
     if (!empty($rcauth_userid) && !empty($rcauth_password) && $domainsynccheck != "on") {
+        // NP-002: skip-if-busy so overlapping CLI cron / admin bulk cannot double-write tblpricing.
+        $rcm_pricesync_lock = rcm_try_lock("dompricesync");
+        if ($rcm_pricesync_lock === false) {
+            logActivity("Domain Price Sync skipped: another sync holds the lock (reseller " . $rcauth_userid . ")");
+            exit("Domain Price Sync skipped: another sync is in progress");
+        }
+        register_shutdown_function(static function () use (&$rcm_pricesync_lock) {
+            rcm_release_lock($rcm_pricesync_lock);
+            $rcm_pricesync_lock = null;
+        });
         if (empty($transferfree_tlds)) {
             $transferfree_tlds = "com.au,net.au,co.uk,me.uk,org.uk,com.ru,net.ru,org.ru,ru,es";
         }
