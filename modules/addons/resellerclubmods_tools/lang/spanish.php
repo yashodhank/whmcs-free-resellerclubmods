@@ -895,7 +895,7 @@ $_ADDONLANG['updaterecurringmessage'] = "Adicionalmente los precios recurrentes 
 $_ADDONLANG['apichachetitle'] = "API Data almacenado";
 $_ADDONLANG['apichachereload'] = "Recargar Datos de API";
 $_ADDONLANG['apichachedesc'] = "Todos los datos recuperados se almacenan en caché de forma automática con el primer acceso. Con el fin de recuperar los datos más recientes, haga clic en el botón de abajo. Tendrá que hacer esto si cambia sus precios de venta o si se habilita nuevos tlds en su cuenta de revendedor";
-$_ADDONLANG['optionflagsdesc0'] = "Con el fin de pasar variables con el método php -q (php cli) es perciso que tenga la directiva PHP register_argc_argv configurado a &quot;On&quot; en el archivo de configuración php.ini. Si su proveedor de hosting no lo permite, entonces tendrá que hacer uso del método GET en su lugar.";
+$_ADDONLANG['optionflagsdesc0'] = "Los scripts de sincronización de precios y verificación de transferencias son solo CLI (<code>php -q</code>). Asegúrese de que <code>register_argc_argv</code> esté On en php.ini para pasar el ID de revendedor como argumento. HTTP GET/lynx/wget contra <code>cron/*.php</code> no está soportado y devuelve 403. Use las recetas CLI de esta página, o la sincronización masiva desde la herramienta admin de precios de dominios (protegida con CSRF).";
 
 # 2.9.3
 
