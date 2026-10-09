@@ -22,6 +22,12 @@ function promo_auto_activate($vars)
     $maileradmin = $conf["maileradmin"];
     $clientgroupid = "0.00";
     if ($promo_auto_activate == "on") {
+        $rcm_daily_lock = rcm_try_lock("dailycron_hooks");
+        if ($rcm_daily_lock === false) {
+            logActivity("Cron Job (RCM): Skipping Auto Promo Activation — daily hooks busy");
+            return;
+        }
+        try {
         if (0 <= version_compare(getWver(), "7.0.0")) {
             $is_v7 = 1;
         }
@@ -227,6 +233,9 @@ function promo_auto_activate($vars)
             }
         } else {
             logActivity("Cron Job: (RCM) No Active Promos found in Reseller Account ID " . $rcauth_userid);
+        }
+        } finally {
+            rcm_release_lock($rcm_daily_lock);
         }
     } else {
         logActivity("Cron Job (RCM): Skipping Auto Promo Activation");
