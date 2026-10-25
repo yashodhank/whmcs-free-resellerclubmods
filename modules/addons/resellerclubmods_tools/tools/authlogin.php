@@ -18,7 +18,7 @@ $CONFIG = $rcmdebuginfo["config"];
 $tid = isset($_REQUEST["tid"]) ? (string) $_REQUEST["tid"] : "";
 global $autoauthkey;
 $systemurl = !empty($CONFIG["SystemSSLURL"]) ? $CONFIG["SystemSSLURL"] : $CONFIG["SystemURL"];
-if ($tid === "") {
+if ($tid === "" || !rcm_bytes_within_cap($tid, rcm_tid_max_bytes())) {
     header("Location: " . $systemurl);
     exit;
 }
@@ -80,7 +80,7 @@ $rchttp_api = $conf["rchttp_api"] ?? "";
 $method = "GET";
 $apifunction = "/api/customers/authenticate-token-without-history.json";
 $data = ["token" => $tid];
-$get_tokendata = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
+$get_tokendata = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method, rcm_public_curl_timeout());
 $action = "auth token";
 // Never log the raw token (RCM-007).
 $requeststring = $apifunction . " [reseller data protected] token=[REDACTED]";

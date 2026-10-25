@@ -230,6 +230,10 @@ switch ($numqty) {
                     }
                     $custarray = explode(",", $rccustids);
                     $recordqty = count($custarray);
+                    if ($recordqty > rcm_domain_import_max_ids()) {
+                        echo "<p>Reduce the customer id count. This request accepts at most 3000 ids.</p>";
+                        return;
+                    }
                     if (300 < $recordqty) {
                         $custarray = array_chunk($custarray, 300);
                     }

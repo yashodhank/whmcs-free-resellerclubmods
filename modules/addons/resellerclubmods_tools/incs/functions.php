@@ -2,8 +2,8 @@
 if (!defined("WHMCS")) {
     exit("This file cannot be accessed directly");
 }
-$releasedate = "2026-10-09";
-$softversion = "2.19.4";
+$releasedate = "2026-10-25";
+$softversion = "2.19.5";
 require_once __DIR__ . "/security.php";
 if (!function_exists("utf8_encode")) {
     function utf8_encode($string)
@@ -480,13 +480,24 @@ if (!function_exists("createOBcustomer")) {
     }
 }
 if (!function_exists("call_api")) {
-    function call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data = [], $method = "GET")
+    function call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data = [], $method = "GET", $timeout = null)
     {
         if (!is_array($data)) {
             $data = [];
         }
         if ($method === null || $method === "") {
             $method = "GET";
+        }
+        $curlTimeout = 120;
+        $connectTimeout = 60;
+        if ($timeout !== null && $timeout !== "") {
+            $requested = (int) $timeout;
+            if ($requested > 0) {
+                $curlTimeout = $requested;
+                if ($connectTimeout > $curlTimeout) {
+                    $connectTimeout = $curlTimeout;
+                }
+            }
         }
         $payload = "auth-userid=" . $rcauth_userid . "&api-key=" . rawurlencode($rcauth_password) . serialize_data($data);
         $ch = curl_init();
@@ -495,8 +506,8 @@ if (!function_exists("call_api")) {
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $curlTimeout);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
