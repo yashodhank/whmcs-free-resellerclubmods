@@ -1,4 +1,7 @@
 <?php
+if (!defined("WHMCS")) {
+    exit("This file cannot be accessed directly");
+}
 // {{{ license
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */

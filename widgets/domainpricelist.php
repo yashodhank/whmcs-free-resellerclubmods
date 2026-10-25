@@ -25,7 +25,7 @@ $td_dompricing = $addonconf["whmcs_style_tdclass"];
 if (empty($td_dompricing)) {
     $td_dompricing = "";
 }
-$price_details = $_GET["details"];
+$price_details = (isset($_GET["details"]) && ($_GET["details"] === "price" || $_GET["details"] === "promos")) ? (string) $_GET["details"] : null;
     $is_language = isset($_SESSION["Language"]) ? $_SESSION["Language"] : $CONFIG["Language"];
     switch ($is_language) {
         case "arabic":

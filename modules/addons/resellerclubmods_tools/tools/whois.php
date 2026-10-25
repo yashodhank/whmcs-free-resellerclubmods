@@ -2,12 +2,7 @@
 $include_path = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
 require_once $include_path . "/init.php";
 require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/functions.php";
-require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/whoislookup.php";
 $conf = rcm_load_addon_conf();
-if (!class_exists("idna_convert")) {
-    require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/idnclass.php";
-}
-$IDN = new idna_convert();
 $widKey = $conf["wid_key"] ?? "";
 if (!rcm_whois_key_acceptable($widKey)) {
     http_response_code(403);
@@ -16,8 +11,6 @@ if (!rcm_whois_key_acceptable($widKey)) {
 }
 $wid = rcm_whois_wid_expected($widKey);
 $md5_wid = $_GET["wid"] ?? null;
-$rawDomain = trim((string) ($_REQUEST["domain"] ?? ""));
-$domain = $IDN->encode(strtolower($rawDomain));
 if (empty($md5_wid)) {
     echo "you need to pass your wid";
     exit;
@@ -27,6 +20,17 @@ if (!hash_equals($wid, (string) $md5_wid)) {
     echo "Unauthorized Access Attempt";
     exit;
 }
+require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/whoislookup.php";
+$rawDomain = trim((string) ($_REQUEST["domain"] ?? ""));
+if (!rcm_bytes_within_cap($rawDomain, rcm_domain_max_bytes())) {
+    echo "domain name too long";
+    exit;
+}
+if (!class_exists("idna_convert")) {
+    require_once ROOTDIR . "/modules/addons/resellerclubmods_tools/incs/idnclass.php";
+}
+$IDN = new idna_convert();
+$domain = $IDN->encode(strtolower($rawDomain));
 $use_account_whois = $conf["use_account_whois"] ?? "";
 $rchttp_api = "https://domaincheck.httpapi.com";
 $conf_arr = [];
@@ -94,11 +98,12 @@ if (!empty($rcauth_userid) && !empty($rcauth_password) && $rawDomain !== "") {
     $method = "GET";
     $apifunction = "/api/domains/available.json";
     $data = ["domain-name" => $sld, "tlds" => $tld];
-    $whoisresult = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
+    $publicTimeout = rcm_public_curl_timeout();
+    $whoisresult = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method, $publicTimeout);
     if (!rcm_api_ok($whoisresult)) {
         $rchttp_api_fallback = (string) ($conf["rchttp_api"] ?? "");
         if ($rchttp_api_fallback !== "") {
-            $whoisresult = call_api($rcauth_userid, $rcauth_password, $rchttp_api_fallback, $apifunction, $data, $method);
+            $whoisresult = call_api($rcauth_userid, $rcauth_password, $rchttp_api_fallback, $apifunction, $data, $method, $publicTimeout);
         }
     }
     $action = "domainlookup with " . $tld_registrar;
@@ -135,7 +140,11 @@ function domainlookup($domain)
     if (empty($whoisserver)) {
         return "No Whois Server found for " . $domain . " domain!";
     }
-    $result = whoislookup($whoisserver, $domain);
+    $deadline = microtime(true) + (float) rcm_whois_deadline_seconds();
+    $result = whoislookup($whoisserver, $domain, $deadline);
+    if ($result === rcm_stream_cap_error() || $result === rcm_whois_timeout_error()) {
+        return $result;
+    }
     if (empty($result)) {
         return "Unable to retrieve results from " . $whoisserver . " server for " . $domain . " domain!";
     }
@@ -143,6 +152,9 @@ function domainlookup($domain)
     $maxHops = 5;
     $seen = [];
     while ($hops < $maxHops && strpos($result, "Whois Server:") !== false) {
+        if (microtime(true) >= $deadline) {
+            return rcm_whois_timeout_error();
+        }
         if (!preg_match("/Whois Server:\\s*(.*)/", $result, $found)) {
             break;
         }
@@ -154,29 +166,54 @@ function domainlookup($domain)
             break;
         }
         $seen[$sponsor_registrar] = true;
-        $result = whoislookup($sponsor_registrar, $domain);
+        $result = whoislookup($sponsor_registrar, $domain, $deadline);
+        if ($result === rcm_stream_cap_error() || $result === rcm_whois_timeout_error()) {
+            return $result;
+        }
         $whoisserver = $sponsor_registrar;
         $hops++;
     }
     return $domain . " Whoislookup results from " . $whoisserver . " server:\n\n" . $result;
 }
 
-function whoislookup($whoisserver, string $domain)
+function whoislookup($whoisserver, string $domain, $deadline = null)
 {
-    $fsp = @fsockopen($whoisserver, 43, $errno, $errstr, 20);
+    $socketTimeout = (float) rcm_whois_socket_seconds();
+    if ($deadline !== null) {
+        $left = (float) $deadline - microtime(true);
+        if ($left <= 0) {
+            return rcm_whois_timeout_error();
+        }
+        if ($left < $socketTimeout) {
+            $socketTimeout = $left;
+        }
+    }
+    $errno = 0;
+    $errstr = "";
+    $fsp = @fsockopen($whoisserver, 43, $errno, $errstr, $socketTimeout);
     if (!$fsp) {
         return "";
     }
+    $seconds = (int) floor($socketTimeout);
+    $micros = (int) round(($socketTimeout - $seconds) * 1000000);
+    if ($seconds < 1 && $micros < 1) {
+        $micros = 1;
+    }
+    stream_set_timeout($fsp, $seconds, $micros);
     fwrite($fsp, $domain . "\r\n");
-    $output = "";
-    while (!feof($fsp)) {
-        $chunk = fgets($fsp);
-        if ($chunk === false) {
-            break;
-        }
-        $output .= $chunk;
+    $output = rcm_read_stream_capped($fsp, rcm_whois_byte_cap());
+    $timedOut = false;
+    $meta = stream_get_meta_data($fsp);
+    if (is_array($meta) && !empty($meta["timed_out"])) {
+        $timedOut = true;
     }
     fclose($fsp);
+    if ($output === rcm_stream_cap_error()) {
+        return $output;
+    }
+    if ($timedOut) {
+        return rcm_whois_timeout_error();
+    }
     $result = "";
     $outLower = strtolower($output);
     if (strpos($outLower, "error") === false && strpos($outLower, "not allocated") === false) {

@@ -384,3 +384,140 @@ if (!function_exists("rcm_release_lock")) {
         }
     }
 }
+
+if (!function_exists("rcm_php_security_release_ok")) {
+    /**
+     * True only on PHP releases that include the October 2026 engine fixes.
+     * 8.2.35–8.2.x, 8.3.36–8.3.x, 8.4.27–8.4.x, 8.5.12–8.5.x.
+     * Older lines have no official fix. Future majors warn until this predicate is updated.
+     * Passing $version lets CLI asserts check the ranges without the host PHP.
+     */
+    function rcm_php_security_release_ok($version = null)
+    {
+        $version = $version === null ? PHP_VERSION : (string) $version;
+        if (version_compare($version, "8.2.35", ">=") && version_compare($version, "8.3.0", "<")) {
+            return true;
+        }
+        if (version_compare($version, "8.3.36", ">=") && version_compare($version, "8.4.0", "<")) {
+            return true;
+        }
+        if (version_compare($version, "8.4.27", ">=") && version_compare($version, "8.5.0", "<")) {
+            return true;
+        }
+        if (version_compare($version, "8.5.12", ">=") && version_compare($version, "8.6.0", "<")) {
+            return true;
+        }
+        return false;
+    }
+}
+
+if (!function_exists("rcm_domain_max_bytes")) {
+    function rcm_domain_max_bytes()
+    {
+        return 253;
+    }
+}
+
+if (!function_exists("rcm_tid_max_bytes")) {
+    function rcm_tid_max_bytes()
+    {
+        return 2048;
+    }
+}
+
+if (!function_exists("rcm_domain_import_max_ids")) {
+    function rcm_domain_import_max_ids()
+    {
+        return 3000;
+    }
+}
+
+if (!function_exists("rcm_whois_byte_cap")) {
+    function rcm_whois_byte_cap()
+    {
+        return 262144;
+    }
+}
+
+if (!function_exists("rcm_whois_deadline_seconds")) {
+    function rcm_whois_deadline_seconds()
+    {
+        return 8;
+    }
+}
+
+if (!function_exists("rcm_whois_socket_seconds")) {
+    function rcm_whois_socket_seconds()
+    {
+        return 3;
+    }
+}
+
+if (!function_exists("rcm_public_curl_timeout")) {
+    /**
+     * Curl timeout for public whois.php and authlogin.php only.
+     * Stays under the WHOIS deadline so curl_exec cannot sit until max_execution_time.
+     * call_api() keeps its 120s default when this is not passed.
+     */
+    function rcm_public_curl_timeout()
+    {
+        return 5;
+    }
+}
+
+if (!function_exists("rcm_stream_cap_error")) {
+    function rcm_stream_cap_error()
+    {
+        return "response exceeded size limit";
+    }
+}
+
+if (!function_exists("rcm_whois_timeout_error")) {
+    function rcm_whois_timeout_error()
+    {
+        return "whois lookup timed out";
+    }
+}
+
+if (!function_exists("rcm_bytes_within_cap")) {
+    /**
+     * Byte length cap for raw input. Use before idna_convert and before API calls.
+     */
+    function rcm_bytes_within_cap($value, $maxBytes)
+    {
+        return strlen((string) $value) <= (int) $maxBytes;
+    }
+}
+
+if (!function_exists("rcm_read_stream_capped")) {
+    /**
+     * Read at most $maxBytes. Over the limit, return a short error and do not keep the tail.
+     * Stops without reading the stream to EOF once the cap is exceeded.
+     */
+    function rcm_read_stream_capped($stream, $maxBytes = 262144)
+    {
+        $maxBytes = (int) $maxBytes;
+        if (!is_resource($stream) || $maxBytes < 1) {
+            return rcm_stream_cap_error();
+        }
+        $output = "";
+        while (!feof($stream)) {
+            $remaining = $maxBytes - strlen($output);
+            if ($remaining <= 0) {
+                break;
+            }
+            $chunk = fread($stream, $remaining);
+            if ($chunk === false || $chunk === "") {
+                break;
+            }
+            $output .= $chunk;
+        }
+        if (strlen($output) >= $maxBytes) {
+            $extra = fread($stream, 1);
+            if ($extra !== false && $extra !== "") {
+                return rcm_stream_cap_error();
+            }
+        }
+        return $output;
+    }
+}
