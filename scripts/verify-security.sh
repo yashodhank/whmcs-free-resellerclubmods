@@ -189,12 +189,13 @@ else
 fi
 
 echo "== Version =="
-if rcm_search_q '\$softversion = "2\.19\.4"' modules/addons/resellerclubmods_tools/incs/functions.php \
-   && rcm_search_q '"version" => "2\.19\.4"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php \
+if rcm_search_q '\$softversion = "2\.19\.5"' modules/addons/resellerclubmods_tools/incs/functions.php \
+   && rcm_search_q '\$releasedate = "2026-10-25"' modules/addons/resellerclubmods_tools/incs/functions.php \
+   && rcm_search_q '"version" => "2\.19\.5"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php \
    && rcm_search_q 'version_compare\(\(string\) \$version, "2\.19\.4", "<"\)' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php; then
-  echo "OK: version 2.19.4; upgrade predicate still < 2.19.4"
+  echo "OK: version 2.19.5; upgrade predicate still < 2.19.4"
 else
-  echo "FAIL: version not 2.19.4 or upgrade predicate changed"
+  echo "FAIL: version not 2.19.5 or upgrade predicate changed"
   fail=1
 fi
 
