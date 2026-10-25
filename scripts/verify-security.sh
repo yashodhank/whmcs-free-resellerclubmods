@@ -42,6 +42,9 @@ done < <(find modules/addons/resellerclubmods_tools includes/hooks widgets scrip
 echo "== Funds math asserts =="
 php scripts/funds_math_assert.php || fail=1
 
+echo "== Request bounds asserts =="
+php scripts/request_bounds_assert.php || fail=1
+
 echo "== Deny: access bypass / hardcoded key =="
 if rcm_search_n 'RCM_GLOBAL_ACCESS_KEY|coreorigin|%bubimanual%' modules/addons/resellerclubmods_tools includes/hooks widgets; then
   echo "FAIL: access bypass markers present"
@@ -105,7 +108,66 @@ for c in modules/addons/resellerclubmods_tools/cron/resellerclubmods_dompricesyn
     echo "FAIL: $c missing rcm_deny_direct_http"
     fail=1
   fi
+  if awk '
+    /PHP_SAPI[[:space:]]*!==[[:space:]]*"cli"/ && sapi == 0 { sapi = NR }
+    /http_response_code[[:space:]]*\([[:space:]]*403[[:space:]]*\)/ && code == 0 { code = NR }
+    /require[[:space:]].*init\.php/ && req == 0 { req = NR }
+    END {
+      if (sapi > 0 && code > 0 && req > 0 && sapi < req && code < req) {
+        exit 0
+      }
+      exit 1
+    }
+  ' "$c"; then
+    echo "OK: $c returns HTTP 403 before init.php"
+  else
+    echo "FAIL: $c SAPI 403 must run before require init.php"
+    fail=1
+  fi
 done
+
+echo "== Ratchet: whois.php capped reader =="
+WHOIS_PHP="modules/addons/resellerclubmods_tools/tools/whois.php"
+if rcm_search_q 'while \(!feof' "$WHOIS_PHP"; then
+  echo "FAIL: whois.php still reads to EOF"
+  fail=1
+else
+  echo "OK: whois.php has no unbounded feof loop"
+fi
+if rcm_search_q 'rcm_read_stream_capped\(' "$WHOIS_PHP"; then
+  echo "OK: whois.php calls the capped reader"
+else
+  echo "FAIL: whois.php missing rcm_read_stream_capped"
+  fail=1
+fi
+if rcm_search_q 'rcm_public_curl_timeout\(' "$WHOIS_PHP" \
+   && rcm_search_q 'rcm_public_curl_timeout\(' modules/addons/resellerclubmods_tools/tools/authlogin.php \
+   && rcm_search_q '\$curlTimeout = 120' modules/addons/resellerclubmods_tools/incs/functions.php; then
+  echo "OK: public callers use a short curl timeout; call_api default stays 120"
+else
+  echo "FAIL: public curl timeout or call_api default missing"
+  fail=1
+fi
+
+echo "== Ratchet: direct-access guards =="
+for g in modules/addons/resellerclubmods_tools/incs/whoislookup.php \
+         modules/addons/resellerclubmods_tools/incs/idnclass.php; do
+  if rcm_search_q '!defined\("WHMCS"\)' "$g"; then
+    echo "OK: $g exits unless WHMCS is defined"
+  else
+    echo "FAIL: $g missing direct-access guard"
+    fail=1
+  fi
+done
+
+echo "== Deny: ini_set and memory_limit=-1 =="
+if rcm_search_n 'ini_set[[:space:]]*\(|memory_limit[[:space:]]*=[[:space:]]*-1' \
+    modules/addons/resellerclubmods_tools includes/hooks widgets; then
+  echo "FAIL: ini_set or memory_limit=-1 present"
+  fail=1
+else
+  echo "OK: no ini_set or memory_limit=-1"
+fi
 
 echo "== Require: security kernel =="
 test -f modules/addons/resellerclubmods_tools/incs/security.php || { echo "FAIL: security.php missing"; fail=1; }
@@ -128,10 +190,11 @@ fi
 
 echo "== Version =="
 if rcm_search_q '\$softversion = "2\.19\.4"' modules/addons/resellerclubmods_tools/incs/functions.php \
-   && rcm_search_q '"version" => "2\.19\.4"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php; then
-  echo "OK: version 2.19.4"
+   && rcm_search_q '"version" => "2\.19\.4"' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php \
+   && rcm_search_q 'version_compare\(\(string\) \$version, "2\.19\.4", "<"\)' modules/addons/resellerclubmods_tools/resellerclubmods_tools.php; then
+  echo "OK: version 2.19.4; upgrade predicate still < 2.19.4"
 else
-  echo "FAIL: version not 2.19.4"
+  echo "FAIL: version not 2.19.4 or upgrade predicate changed"
   fail=1
 fi
 
