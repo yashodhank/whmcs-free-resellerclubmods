@@ -124,7 +124,7 @@ function modify_rc_account($vars)
                     if (empty($language)) {
                         $language = strtolower($CONFIG["Language"]);
                     }
-                    $langPref = checkLang($language);
+                    $langPref = checkLang($language) ?: "en";
                     if ("8.0.0" <= getWver() && $confstring[4] == "on") {
                         $result_tblusers = Illuminate\Database\Capsule\Manager::table("tblusers")->where("id", "=", $vars["olddata"]["owner_user_id"])->select("email")->get();
                         $tblusers_email = $result_tblusers[0]->email;

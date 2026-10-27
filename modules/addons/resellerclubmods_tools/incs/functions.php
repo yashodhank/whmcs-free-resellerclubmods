@@ -365,8 +365,8 @@ if (!function_exists("checkLang")) {
                 break;
             default:
                 $langPref = "en";
-                return $langPref;
         }
+        return $langPref;
     }
 }
 if (!function_exists("serialize_data")) {
