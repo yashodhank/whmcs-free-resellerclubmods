@@ -33,7 +33,7 @@ function create_rc_account($vars)
         if (empty($language)) {
             $language = strtolower($CONFIG["Language"]);
         }
-        $langPref = checkLang($language);
+        $langPref = checkLang($language) ?: "en";
         foreach ($conf_arr as $confstring) {
             if ($confstring[3] != "on" && !empty($confstring[0])) {
                 list($rcauth_userid, $rcauth_password, $logicbox_registrar, $use_internal_cupwd) = $confstring;
