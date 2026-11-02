@@ -2,6 +2,11 @@
 /**
  * CLI-only transfer check entry (RCM-001). HTTP denied — no access-key backdoor.
  */
+if (PHP_SAPI !== "cli") {
+    http_response_code(403);
+    header("Content-Type: text/plain; charset=UTF-8");
+    exit("Forbidden: this script is CLI-only. Use php -q …/cron/….php [reseller_id]");
+}
 $filepath = substr(__FILE__, 0, -34);
 if (file_exists($filepath . "/path.php")) {
     include $filepath . "/path.php";

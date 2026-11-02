@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]
+        php: ["7.4", "8.0", "8.1", "8.2.35", "8.3.36", "8.4.27"]
     steps:
       - uses: actions/checkout@v4
 
@@ -22,6 +22,37 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring
+
+      - name: Print PHP_VERSION and fail if below pin
+        env:
+          PHP_PIN: ${{ matrix.php }}
+        run: |
+          php <<'PHP'
+          <?php
+          $pin = getenv("PHP_PIN");
+          $got = PHP_VERSION;
+          echo "PHP_VERSION=" . $got . "\n";
+          echo "PHP_PIN=" . $pin . "\n";
+          if (!is_string($pin) || $pin === "") {
+              fwrite(STDERR, "PHP_PIN is empty\n");
+              exit(1);
+          }
+          $pinParts = explode(".", $pin);
+          $gotParts = explode(".", $got);
+          $gotMinor = isset($gotParts[1]) ? preg_replace("/[^0-9].*$/", "", $gotParts[1]) : "";
+          if (count($pinParts) >= 2) {
+              $pinMinor = $pinParts[1];
+              if (($pinParts[0] ?? "") !== ($gotParts[0] ?? "") || $pinMinor !== $gotMinor) {
+                  fwrite(STDERR, "installed PHP minor does not match the pin\n");
+                  exit(1);
+              }
+          }
+          if (version_compare($got, $pin, "<")) {
+              fwrite(STDERR, "PHP_VERSION is below the pin\n");
+              exit(1);
+          }
+          exit(0);
+          PHP
 
       - name: Syntax check all PHP files
         run: |
