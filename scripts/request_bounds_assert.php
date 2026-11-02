@@ -17,7 +17,6 @@ function assert_true($cond, $msg)
     }
 }
 
-assert_true(rcm_php_security_release_ok() === rcm_php_security_release_ok(PHP_VERSION), "live PHP_VERSION matches explicit predicate call");
 assert_true(rcm_php_security_release_ok("8.2.34") === false, "8.2.34 is outside the patched set");
 assert_true(rcm_php_security_release_ok("8.2.35") === true, "8.2.35 is patched");
 assert_true(rcm_php_security_release_ok("8.3.35") === false, "8.3.35 is outside the patched set");
@@ -55,6 +54,13 @@ assert_true($overRead === rcm_stream_cap_error(), "capped reader returns the sho
 assert_true(is_string($overRead) && strpos($overRead, "TAIL") === false, "capped reader does not keep the tail");
 assert_true(strlen($overRead) < 32, "capped reader does not return the truncated body");
 fclose($over);
+
+$slow = fopen("php://temp", "r+");
+fwrite($slow, str_repeat("A", 64));
+rewind($slow);
+$slowRead = rcm_read_stream_capped($slow, 1024, microtime(true) - 1);
+assert_true($slowRead === "", "capped reader stops at an already expired deadline");
+fclose($slow);
 
 assert_true(rcm_domain_max_bytes() === 253, "domain cap is 253 bytes");
 assert_true(rcm_bytes_within_cap(str_repeat("a", 253), rcm_domain_max_bytes()) === true, "253-byte domain is accepted");

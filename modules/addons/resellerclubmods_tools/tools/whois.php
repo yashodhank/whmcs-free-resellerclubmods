@@ -201,8 +201,8 @@ function whoislookup($whoisserver, string $domain, $deadline = null)
     }
     stream_set_timeout($fsp, $seconds, $micros);
     fwrite($fsp, $domain . "\r\n");
-    $output = rcm_read_stream_capped($fsp, rcm_whois_byte_cap());
-    $timedOut = false;
+    $output = rcm_read_stream_capped($fsp, rcm_whois_byte_cap(), $deadline);
+    $timedOut = $deadline !== null && microtime(true) >= (float) $deadline;
     $meta = stream_get_meta_data($fsp);
     if (is_array($meta) && !empty($meta["timed_out"])) {
         $timedOut = true;

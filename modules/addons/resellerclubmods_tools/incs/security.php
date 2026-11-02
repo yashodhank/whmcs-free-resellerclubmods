@@ -493,8 +493,11 @@ if (!function_exists("rcm_read_stream_capped")) {
     /**
      * Read at most $maxBytes. Over the limit, return a short error and do not keep the tail.
      * Stops without reading the stream to EOF once the cap is exceeded.
+     * With $deadline (a microtime(true) timestamp) the loop also stops once the
+     * deadline passes, so a slow server cannot hold the worker past the total
+     * budget; callers detect that with microtime(true) >= $deadline.
      */
-    function rcm_read_stream_capped($stream, $maxBytes = 262144)
+    function rcm_read_stream_capped($stream, $maxBytes = 262144, $deadline = null)
     {
         $maxBytes = (int) $maxBytes;
         if (!is_resource($stream) || $maxBytes < 1) {
@@ -502,6 +505,9 @@ if (!function_exists("rcm_read_stream_capped")) {
         }
         $output = "";
         while (!feof($stream)) {
+            if ($deadline !== null && microtime(true) >= (float) $deadline) {
+                return $output;
+            }
             $remaining = $maxBytes - strlen($output);
             if ($remaining <= 0) {
                 break;
