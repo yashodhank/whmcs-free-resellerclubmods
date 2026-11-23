@@ -544,7 +544,7 @@ if (!function_exists("registrardropdown")) {
         array_push($tblregistrars, "None");
         $tblregistrars = array_unique($tblregistrars);
         sort($tblregistrars);
-        $registrar_dropdown .= "<select name=\"autoreg\" class=\"form-control\" style=\"display: inline; width: auto\">";
+        $registrar_dropdown = "<select name=\"autoreg\" class=\"form-control\" style=\"display: inline; width: auto\">";
         foreach ($tblregistrars as $lbregistrars) {
             if (!empty($setautoreg) && $is_registrar == $lbregistrars) {
                 $registrar_dropdown .= "<option value=\"" . $lbregistrars . "\" " . $setautoreg . ">" . $lbregistrars . "</option>";

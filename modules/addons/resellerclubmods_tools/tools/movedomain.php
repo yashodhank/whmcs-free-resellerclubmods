@@ -7,7 +7,7 @@ echo "<script type=\"text/javascript\">\r\n\$(document).ready(function(){\r\n\t\
 if ($_REQUEST["movesearch"] == "true") {
     echo $configuredto;
     echo $introdesc;
-    $oldowner = $_REQUEST["oldowner"];
+    $oldowner = isset($_REQUEST["oldowner"]) && ctype_digit((string) $_REQUEST["oldowner"]) ? (int) $_REQUEST["oldowner"] : 0;
     if (empty($oldowner)) {
         header("location: " . $modulelink . "&domain=moveservices");
         exit;

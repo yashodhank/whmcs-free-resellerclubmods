@@ -48,6 +48,9 @@ php scripts/request_bounds_assert.php || fail=1
 echo "== Promo exclusion asserts =="
 php scripts/promo_exclusion_assert.php || fail=1
 
+echo "== Hardening contract asserts =="
+php scripts/hardening_contracts_assert.php || fail=1
+
 echo "== Deny: access bypass / hardcoded key =="
 if rcm_search_n 'RCM_GLOBAL_ACCESS_KEY|coreorigin|%bubimanual%' modules/addons/resellerclubmods_tools includes/hooks widgets; then
   echo "FAIL: access bypass markers present"

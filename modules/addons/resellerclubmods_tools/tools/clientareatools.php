@@ -127,23 +127,35 @@ function resellerclubmods_tools_clientarea($vars)
                     if ($_REQUEST["m"] == "resellerclubmods_tools" && !is_null($primarySidebar->getChild("Domain Details Management"))) {
                         $primarySidebar->getChild("Domain Details Management")->addChild("Move Domain", ["label" => $_LANG["clientareamovetitle"], "uri" => "index.php?m=resellerclubmods_tools&action=movedomain&domain=" . $domain . "&domainid=" . $domainid, "order" => 120]);
                         if ($_REQUEST["action"] == "movedomain") {
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Move Domain")->setClass("active");
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Move Domain")) !== null) {
+                                $rcmChild->setClass("active");
+                            }
                         }
                     }
                     if (file_exists(ROOTDIR . "/dnsmanagement.php") && in_array($isregistrar, $isregistrar_array) && !empty($isdnsmanagement) && !is_null($primarySidebar->getChild("Domain Details Management"))) {
-                        $primarySidebar->getChild("Domain Details Management")->getChild("Manage DNS Host Records")->setUri("dnsmanagement.php?action=managednszone&domain=" . $domain . "&domainid=" . $domainid);
+                        if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Manage DNS Host Records")) !== null) {
+                            $rcmChild->setUri("dnsmanagement.php?action=managednszone&domain=" . $domain . "&domainid=" . $domainid);
+                        }
                         $primarySidebar->getChild("Domain Details Management")->addChild("Domain Forwarding", ["label" => $_LANG["rcdns_domainfwd"], "uri" => "domainforwarding.php?action=managedomfwd&domain=" . $domain . "&domainid=" . $domainid, "order" => 110]);
                         if (App::getCurrentFilename() == "dnsmanagement") {
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Manage DNS Host Records")->setClass("active");
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Manage DNS Host Records")) !== null) {
+                                $rcmChild->setClass("active");
+                            }
                         }
                         if (App::getCurrentFilename() == "domainforwarding") {
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Domain Forwarding")->setClass("active");
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Domain Forwarding")) !== null) {
+                                $rcmChild->setClass("active");
+                            }
                         }
                     }
                     if (file_exists(ROOTDIR . "/emailmanagement.php") && in_array($isregistrar, $isregistrar_array) && !empty($isemailforwarding) && !is_null($primarySidebar->getChild("Domain Details Management"))) {
-                        $primarySidebar->getChild("Domain Details Management")->getChild("Manage Email Forwarding")->setUri("emailmanagement.php?action=managemailhosting&domain=" . $domain . "&domainid=" . $domainid)->setLabel($_LANG["rcmail_managemailhosting"]);
+                        if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Manage Email Forwarding")) !== null) {
+                            $rcmChild->setUri("emailmanagement.php?action=managemailhosting&domain=" . $domain . "&domainid=" . $domainid)->setLabel($_LANG["rcmail_managemailhosting"]);
+                        }
                         if (App::getCurrentFilename() == "emailmanagement") {
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Manage Email Forwarding")->setClass("active");
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Manage Email Forwarding")) !== null) {
+                                $rcmChild->setClass("active");
+                            }
                         }
                     }
                     if (file_exists(ROOTDIR . "/domainmanagement.php") && in_array($isregistrar, $isregistrar_array)) {
@@ -162,8 +174,12 @@ function resellerclubmods_tools_clientarea($vars)
                             }
                         }
                         if (!is_null($primarySidebar->getChild("Domain Details Management"))) {
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Domain Contacts")->setUri("domainmanagement.php?action=domaincontacts&domain=" . $domain . "&domainid=" . $domainid);
-                            $primarySidebar->getChild("Domain Details Management")->getChild("Manage Private Nameservers")->setUri("domainmanagement.php?action=childns&domain=" . $domain . "&domainid=" . $domainid);
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Domain Contacts")) !== null) {
+                                $rcmChild->setUri("domainmanagement.php?action=domaincontacts&domain=" . $domain . "&domainid=" . $domainid);
+                            }
+                            if (($rcmChild = $primarySidebar->getChild("Domain Details Management")->getChild("Manage Private Nameservers")) !== null) {
+                                $rcmChild->setUri("domainmanagement.php?action=childns&domain=" . $domain . "&domainid=" . $domainid);
+                            }
                             if ($is_dnssec != "on" && $is_dnssectld == 1) {
                                 $primarySidebar->getChild("Domain Details Management")->addChild("DNSSEC Management", ["label" => $_LANG["rcdom_dnssecsidebartitle"], "uri" => "domainmanagement.php?action=managednssec&domain=" . $domain . "&domainid=" . $domainid, "order" => 100]);
                             }
@@ -316,7 +332,7 @@ function resellerclubmods_tools_clientarea($vars)
         if ($domainbot_nossl == "on") {
             $do_forcessl = false;
         }
-        if (isset($_REQUEST["suggest"]) && !empty($_REQUEST["keyword"]) && isset($_REQUEST["tlds"])) {
+        if (isset($_REQUEST["suggest"]) && !empty($_REQUEST["keyword"]) && is_string($_REQUEST["keyword"]) && isset($_REQUEST["tlds"]) && is_array($_REQUEST["tlds"])) {
             $suggestresults = "true";
             $keyword = utf8_encode($_REQUEST["keyword"]);
             $rctlds = array_slice($_REQUEST["tlds"], 0, $domainbot_extqty);

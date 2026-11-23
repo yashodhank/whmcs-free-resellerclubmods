@@ -47,7 +47,7 @@ function promo_auto_activate($vars)
             $in_whmcs_extensions[$ext_data->id] = $ext_data->extension;
         }
         $apifunction = "/api/resellers/promo-details.json";
-        $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
+        $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, [], "GET");
         $productkeys = newproductkeys($rcauth_userid, $rcauth_password, $rchttp_api);
         if (!empty($xml_getpromosdetails)) {
             foreach ($xml_getpromosdetails as $promos) {
