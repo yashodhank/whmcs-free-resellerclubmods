@@ -23,6 +23,7 @@ if (0 <= version_compare(getWver(), "6.0.0")) {
         }
         $allow_movedomain = $vars["allow_movedomain"];
         $movedomain_permission = $vars["movedomain_permission"];
+        $accessdenied = "";
         if ($movedomain_permission != "Client and Admin" && !isset($_SESSION["adminid"])) {
             $accessdenied = "on";
         }

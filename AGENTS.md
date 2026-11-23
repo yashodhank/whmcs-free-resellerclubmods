@@ -130,15 +130,9 @@ Both families read `tbladdonmodules` for addon settings independently.
 - Ship WHMCS drop-in module zips under `dist/` for releases.
 - 2.19.5 request limits (userland only; they do not patch the PHP engine): WHOIS reads stop at 256KB with an 8s deadline and 3s per socket; raw domain input is capped at 253 bytes before `idna_convert`; `authlogin.php` `tid` is capped at 2048 bytes; public `whois.php` and `authlogin.php` pass a 5s curl timeout into `call_api()`; the `call_api()` default stays 120s; Domain Import stops above 3000 posted customer ids and does not tell operators to raise `memory_limit`. Admin home shows an English warning when `PHP_VERSION` is outside 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 (8.5.x at or after 8.5.12 is quiet; future majors warn). The warning does not disable features. See [docs/evidence/php2shell.md](docs/evidence/php2shell.md).
 
-### Dokploy bake path (do not run from a module-only PR)
+### Production bake
 
-1. Land the module on `yashodhank/whmcs-free-resellerclubmods` `main` (`gh-account` account `yashodhank`). Run `gh-account preflight` before any GitHub write.
-2. Bake into `securiace-dev/whmcs-prod-new` (same account, org repo). Package `resellerclubmods_tools` has no `sync.sourceRepo`, so `scripts/sync-overlay-package.sh` will not refresh it. Copy the addon tree and these ten hook files by name: `domainrecurring`, `fundthreshold`, `nameservers`, `promoactivate`, `promoupdate`, `raadomainreport`, `rcchangepwd`, `rcdeleteclient`, `rcmodifyclient`, `rcsignup`. Do not `--delete` `includes/hooks/`; `resellerclubmods_navbar_compat.php` exists only in the overlay. Copy `widgets/domainpricelist.php` separately (catalog id `domainpricelist_widget`). Update `overlays/modules/addons/resellerclubmods_tools/.overlay-source-sha` (2.19.4 pin `9dab25976b263b8bcba550262b85451eefeba395`).
-3. Overlay PR to `whmcs-prod-new` `main`. Wait until `production-image` and `release-identity` are green. Deploy the installer-removed `ghcr.io/securiace-dev/whmcs-prod-new@sha256:…` from artifact `whmcs-published-release-identity`.
-4. Dokploy compose `L_GzFCnhhpQfZi9T4MECD` on ded1 (`my.securiace.com`): back up the panel env, `compose.update` only `WHMCS_IMAGE` / `VCS_REF` / `BUILD_DATE`, pre-pull, `compose.deploy`. Prove digest, `VCS_REF`, and both version strings. Host cron `/etc/cron.d/whmcs-rcm-resellerclubmods` must survive. `whois.json` is runtime state; the 2026-10-09 image seeds it if missing.
-5. PHP upgrade is a different change in that repo: replace the `php:8.3-apache` digest with a build whose `PHP_VERSION` is `>= 8.3.36`, and set `session.upload_progress.enabled=0` until that image is the one actually running. Optionally reject `multipart/form-data` and apply `LimitRequestBody` at Apache for the public scripts. Do not set `memory_limit=-1` from this module.
-
-Last tools bake before 2.19.5: overlay PR #105, image `sha256:5e4df068e518f931388fea357a6c015c40dcce256baa1b6e70cf4e011bc6c88d`, `softversion` 2.19.4 (ledger `20261009-121447Z`). Live base pin at the time of this note: `php:8.3-apache@sha256:bcf7ac6941725b08123df2732065b8ede097ed0977ba2891b411654efb35cc23`.
+Production packaging and deploy steps for this addon live in the operator's private overlay repository, not in this public repo. Module PRs here never deploy. Do not add hostnames, container names, compose IDs, image digests or reseller account IDs to this repo.
 
 ## Gates and conventions (added by continuity pass)
 

@@ -5,6 +5,7 @@ if (!defined("WHMCS")) {
 $releasedate = "2026-10-25";
 $softversion = "2.19.5";
 require_once __DIR__ . "/security.php";
+require_once __DIR__ . "/promo_exclusion.php";
 if (!function_exists("utf8_encode")) {
     function utf8_encode($string)
     {
@@ -543,7 +544,7 @@ if (!function_exists("registrardropdown")) {
         array_push($tblregistrars, "None");
         $tblregistrars = array_unique($tblregistrars);
         sort($tblregistrars);
-        $registrar_dropdown .= "<select name=\"autoreg\" class=\"form-control\" style=\"display: inline; width: auto\">";
+        $registrar_dropdown = "<select name=\"autoreg\" class=\"form-control\" style=\"display: inline; width: auto\">";
         foreach ($tblregistrars as $lbregistrars) {
             if (!empty($setautoreg) && $is_registrar == $lbregistrars) {
                 $registrar_dropdown .= "<option value=\"" . $lbregistrars . "\" " . $setautoreg . ">" . $lbregistrars . "</option>";

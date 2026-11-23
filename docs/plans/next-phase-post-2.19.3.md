@@ -20,9 +20,9 @@
 
 ## Immediate operator (no code)
 
-1. **CLI cron scheduled (2026-10-09):** installed host `/etc/cron.d/whmcs-rcm-resellerclubmods` on ded1 via `docker exec` into `whmcs-production-jvjwfo-app-1` (CLI `php -q` only; no HTTP/`cron_access_key`). Reseller IDs from live `tbladdonmodules`: `292570`, `283000`, `368170`, `1139557`. WHMCS system cron remains Dokploy-owned (`composeId` `L_GzFCnhhpQfZi9T4MECD`). Runners self-gate (`*_domainsync_check=on` / `*_transer_check=on` skip).
+1. **CLI cron scheduled (2026-10-09):** the operator installed a host cron entry that runs WHMCS `crons/cron.php` with CLI `php -q` inside the production app container (no HTTP cron, no `cron_access_key`). Host, container and reseller account details are kept in the private ops repo.
 2. **`wid_key` hygiene:** length ≥16 and HMAC wid URL present; rotate only if operator wants a fresh secret, then re-copy whois URLs / `whois.json`. **Do not rotate without explicit confirmation.**
-3. **Writable `whois.json` restored (2026-10-09):** seeded from `dist.whois.json` (was missing); `www-data:www-data` on file + dir; `is_writable` passes as www-data (GUI check = writable). Re-bake ownership in `whmcs-prod-new` overlay so redeploys do not regress to `root:root` / missing file.
+3. **Writable `whois.json` restored (2026-10-09):** seeded from `dist.whois.json` (was missing); `www-data:www-data` on file + dir; `is_writable` passes as www-data (GUI check = writable). Re-bake ownership in private overlay so redeploys do not regress to `root:root` / missing file.
 
 ## P0 / P1 — product amendments (2.19.4 candidate)
 

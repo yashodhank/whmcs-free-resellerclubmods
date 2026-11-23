@@ -411,7 +411,7 @@ if (isset($_POST["applypromo"]) && !empty($_POST["promotlds"])) {
 $method = "GET";
 if ((rcm_session_cache_get("rcm_promodetails." . $rcauth_userid) === null)) {
     $apifunction = "/api/resellers/promo-details.json";
-    $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
+    $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, [], "GET");
     rcm_session_cache_set("rcm_promodetails." . $rcauth_userid, $xml_getpromosdetails);
 } else {
     $xml_getpromosdetails = rcm_session_cache_get("rcm_promodetails." . $rcauth_userid);
@@ -481,7 +481,7 @@ if (isset($_REQUEST["tld"]) && isset($_REQUEST["currency"]) && isset($_REQUEST["
 echo $configuredto;
 echo "<h1>" . $LANG["domainpromos"] . "</h1>";
 echo "<div class=\"alert alert-info\">";
-echo "<p><strong>" . $LANG["domainpricelistwidget"] . "</strong><br />" . $LANG["domainpromospricelistdesc"] . " <a target=\"_blank\" href=\"https://www.resellerclub-mods.com/whmcs/resellerclub-tools-docs.php\">Howto install FREE RC & LB Tools</a></p>";
+echo "<p><strong>" . $LANG["domainpricelistwidget"] . "</strong><br />" . $LANG["domainpromospricelistdesc"] . "</p>";
 echo "</div>";
 echo "<p><strong>" . $LANG["autopromoactivate"] . "</strong> <img class=\"absmiddle\" style=\"cursor:help;\" src=\"../modules/addons/resellerclubmods_tools/img/help.png\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"" . $LANG["autoactivatepromohelp"] . "\" height=\"16\" width=\"16\" /> " . $is_promoactivate . "<br />";
 echo "<strong>" . $LANG["autoupdatepromo"] . "</strong> <img class=\"absmiddle\" style=\"cursor:help;\" src=\"../modules/addons/resellerclubmods_tools/img/help.png\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"" . $LANG["autoupdatepromohelp"] . "\" height=\"16\" width=\"16\" /> " . $is_promoactive . "<br />";

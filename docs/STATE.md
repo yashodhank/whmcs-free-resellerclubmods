@@ -6,7 +6,7 @@
 
 ## In flight
 
-- None known. Public repo: keep new text free of secrets and infrastructure identifiers.
+- Local branch `fix/rc-preupgrade-20261123` (2026-11-23 pre-9.1 audit, not pushed yet): promo TLD exclusion port, Move Domain input typing (XSS), sidebar null guards, PHP 8 warnings, public-doc scrub. Details: `docs/handoff/STATE.md`, `docs/handoff/TASKS.md`. Tests pass on PHP 7.4/8.3/8.4.
 
 ## Next
 

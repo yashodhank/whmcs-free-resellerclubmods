@@ -1,0 +1,7 @@
+
+# Agent tooling (repo continuity convention)
+.agent/
+.serena/
+.cursor/*
+!.cursor/rules/
+.nav-runtime-state.json

@@ -527,3 +527,23 @@ if (!function_exists("rcm_read_stream_capped")) {
         return $output;
     }
 }
+if (!function_exists("rcm_req_int")) {
+    /** Positive integer id from request data, else 0 (ids are echoed into admin HTML). */
+    function rcm_req_int($value)
+    {
+        return is_scalar($value) && ctype_digit((string) $value) ? (int) $value : 0;
+    }
+}
+if (!function_exists("rcm_req_domain")) {
+    /** Domain name (letters incl. IDN, digits, dot, hyphen), else "". */
+    function rcm_req_domain($value)
+    {
+        return is_string($value) && preg_match('/^[\p{L}\p{N}.\-]{1,253}$/u', $value) ? $value : "";
+    }
+}
+if (!function_exists("rcm_req_email")) {
+    function rcm_req_email($value)
+    {
+        return is_string($value) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false ? $value : "";
+    }
+}
