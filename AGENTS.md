@@ -139,3 +139,32 @@ Both families read `tbladdonmodules` for addon settings independently.
 5. PHP upgrade is a different change in that repo: replace the `php:8.3-apache` digest with a build whose `PHP_VERSION` is `>= 8.3.36`, and set `session.upload_progress.enabled=0` until that image is the one actually running. Optionally reject `multipart/form-data` and apply `LimitRequestBody` at Apache for the public scripts. Do not set `memory_limit=-1` from this module.
 
 Last tools bake before 2.19.5: overlay PR #105, image `sha256:5e4df068e518f931388fea357a6c015c40dcce256baa1b6e70cf4e011bc6c88d`, `softversion` 2.19.4 (ledger `20261009-121447Z`). Live base pin at the time of this note: `php:8.3-apache@sha256:bcf7ac6941725b08123df2732065b8ede097ed0977ba2891b411654efb35cc23`.
+
+## Gates and conventions (added by continuity pass)
+
+```bash
+bash scripts/verify-security.sh                       # static security gate; also pins version 2.19.5 / upgrade predicate
+php scripts/funds_math_assert.php && php scripts/request_bounds_assert.php
+find modules includes widgets -name '*.php' -print0 | xargs -0 -n1 php -l
+bash scripts/check-continuity.sh
+```
+
+`.github/workflows/php-compat.yml` runs the PHP compatibility lint. Version lives in `modules/addons/resellerclubmods_tools/resellerclubmods_tools.php` (`"version"`) and `incs/functions.php` (`$softversion`); keep both and `verify-security.sh` in step on a bump. There is no CHANGELOG; do not invent one. This repo is **public**: no secrets, hostnames, compose IDs or admin folder names in new text. Branches `feat|fix|docs|chore/<scope>` from `origin/main`; PR against `main`. This desk may merge module PRs after review; leave `whmcs-prod-new` PRs for WHMCS-Prod; never commit directly to `main`. Done = gates green, STATE updated.
+
+## Continuity (tool-agnostic)
+
+This repo follows the desk continuity standard (`CONTINUITY-STANDARD.md` in desk-os). Claude Code, Codex, agy, OpenCode, Cursor and any future tool start here.
+
+- **Entry point:** this file (`AGENTS.md`). `CLAUDE.md`, `GEMINI.md` and `.cursor/rules/agents.mdc` only point here.
+- **Session state:** `docs/STATE.md` — current version, what is in flight, next steps, last-session summary. Rewrite it at the end of every session (IST timestamps).
+- **Decisions:** `docs/decisions/` (ADR files). Add one when the owner or an architecture choice is made. Do not rewrite old ADRs.
+- **Agreement gate:** `bash scripts/check-continuity.sh` must pass before push (`docs/continuity.conf`). It fails if the version, CHANGELOG and STATE disagree.
+- **Checkpoints:** small commits; push the feature or WIP branch before you stop; leave no uncommitted work in the worktree; never switch or dirty the user's primary checkout. Use a new worktree from `origin/<default-branch>`.
+- **Desk checklists:** `SESSION-START.md` and `SESSION-END.md` in desk-os (`/workspace/whmcs-modules/desk-os/` or `~/Projects/whmcs-modules/desk-os/`).
+- Enable hooks in each clone or worktree: `git config core.hooksPath .githooks`.
+
+### Hard rules (fleet)
+
+- No secrets in chat or commits. Never print the live admin folder name (write `ADMIN_PATH`). Never circumvent ionCube. Never touch the WHMCS core licence.
+- Production is read-only for this desk. No live deploy. `whmcs-prod-new` merges belong to WHMCS-Prod; deploys belong to CntbOps after Mr. Y's own pick.
+- Local checks only; no paid GitHub Actions. Use `gh-account` (unset `GIT_CONFIG_*` first). Repos stay private unless the owner says otherwise.
