@@ -21,6 +21,7 @@ function promo_auto_activate($vars)
     $promo_auto_activate = $conf["promo_auto_activate"];
     $maileradmin = $conf["maileradmin"];
     $clientgroupid = "0.00";
+    $promo_excluded_tlds = rcm_promo_excluded_tlds($conf);
     if ($promo_auto_activate == "on") {
         $rcm_daily_lock = rcm_try_lock("dailycron_hooks");
         if ($rcm_daily_lock === false) {
@@ -87,6 +88,10 @@ function promo_auto_activate($vars)
                 }
             }
             foreach ($promo_plans as $promodetails) {
+                if (rcm_promo_is_excluded($promodetails["tld"], $promo_excluded_tlds)) {
+                    rcm_promo_log_skip("auto-activate", $promodetails["tld"], $promodetails["type"], $promodetails["endtime"]);
+                    continue;
+                }
                 $mod_resellerclubmodspromo = Illuminate\Database\Capsule\Manager::table("mod_resellerclubmodspromo")->where("relid", "=", $promodetails["id"])->where("type", "=", $promodetails["type"])->select("extension", "promoprice")->get();
                 $is_promo_tld = $mod_resellerclubmodspromo[0]->extension;
                 $is_old_promoprice = $mod_resellerclubmodspromo[0]->promoprice;

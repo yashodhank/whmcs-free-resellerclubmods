@@ -17,6 +17,7 @@ function promo_update_price($vars)
     $rchttp_api = $conf["rchttp_api"];
     $clientgroupid = "0";
     $is_currencydoupd = $conf["domainsync_currencydoupd"];
+    $promo_excluded_tlds = rcm_promo_excluded_tlds($conf);
     $promo_terminate_days = 0;
     if ($conf["promo_terminate_days"]) {
         $promo_terminate_days = round($conf["promo_terminate_days"]);
@@ -68,6 +69,10 @@ function promo_update_price($vars)
             $promomail .= "<div style=\"font-family: verdana; font-size: 11px; font-weight: normal;\">";
             $promomail .= "<p>" . $LANG["promomail01"] . "</p>";
             foreach ($promo_array as $promo_data) {
+                if (rcm_promo_is_excluded($promo_data["extension"], $promo_excluded_tlds)) {
+                    rcm_promo_log_skip("auto-update", $promo_data["extension"], $promo_data["type"], $promo_data["promoend"]);
+                    continue;
+                }
                 if ($promo_data["promoend"] < $customdate || $promo_data["promoend"] < $datenow || $promo_data["promoend"] < $datesafe) {
                     $realsellingprice = $promo_data["sellingprice"];
                     $tldstrings = $promo_data["extension"];

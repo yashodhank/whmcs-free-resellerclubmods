@@ -5,6 +5,7 @@ if (!defined("WHMCS")) {
 $releasedate = "2026-10-25";
 $softversion = "2.19.5";
 require_once __DIR__ . "/security.php";
+require_once __DIR__ . "/promo_exclusion.php";
 if (!function_exists("utf8_encode")) {
     function utf8_encode($string)
     {
