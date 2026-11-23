@@ -411,7 +411,7 @@ if (isset($_POST["applypromo"]) && !empty($_POST["promotlds"])) {
 $method = "GET";
 if ((rcm_session_cache_get("rcm_promodetails." . $rcauth_userid) === null)) {
     $apifunction = "/api/resellers/promo-details.json";
-    $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, $data, $method);
+    $xml_getpromosdetails = call_api($rcauth_userid, $rcauth_password, $rchttp_api, $apifunction, [], "GET");
     rcm_session_cache_set("rcm_promodetails." . $rcauth_userid, $xml_getpromosdetails);
 } else {
     $xml_getpromosdetails = rcm_session_cache_get("rcm_promodetails." . $rcauth_userid);

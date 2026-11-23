@@ -65,9 +65,9 @@ if ($_REQUEST["movesearch"] == "true") {
 } else if ($_POST["moveprepare"] == "true") {
     echo $configuredto;
     echo $introdesc;
-    $oldcustomerid = $_POST["oldowner"];
-    $newcustomerid = $_POST["newowner"];
-    $domainname = $_POST["domainname"];
+    $oldcustomerid = rcm_req_int($_POST["oldowner"] ?? "");
+    $newcustomerid = rcm_req_int($_POST["newowner"] ?? "");
+    $domainname = rcm_req_domain($_POST["domainname"] ?? "");
     $result = Illuminate\Database\Capsule\Manager::table("tblclients")->where("id", "=", $oldcustomerid)->select("email")->get();
     $oldcustomeremail = $result[0]->email;
     if (empty($oldcustomeremail)) {
@@ -173,15 +173,17 @@ if ($_REQUEST["movesearch"] == "true") {
         }
     }
 } else if ($_POST["domove"] == "true") {
-    $newcustomermail = $_POST["newcustomermail"];
-    $oldcustomermail = $_POST["oldcustomermail"];
-    $oldcustomerid = $_POST["oldcustomerid"];
-    $existing_customerid = $_POST["oldrccustomerid"];
-    $domainname = $_POST["domainname"];
-    $newcustomerid = $_POST["newcustomer"];
-    $contacttype = $_POST["contact"];
-    $domainid = $_POST["domainid"];
-    $productid = $_POST["productid"];
+    // Every value below is echoed into the result page or links; keep them to their real types.
+    $newcustomermail = rcm_req_email($_POST["newcustomermail"] ?? "");
+    $oldcustomermail = rcm_req_email($_POST["oldcustomermail"] ?? "");
+    $oldcustomerid = rcm_req_int($_POST["oldcustomerid"] ?? "");
+    $existing_customerid = rcm_req_int($_POST["oldrccustomerid"] ?? "");
+    $domainname = rcm_req_domain($_POST["domainname"] ?? "");
+    $newcustomerid = rcm_req_int($_POST["newcustomer"] ?? "");
+    $contacttype = isset($_POST["contact"]) && is_string($_POST["contact"]) && preg_match('/^[a-z]{1,20}$/i', $_POST["contact"]) ? $_POST["contact"] : "";
+    $domainid = rcm_req_int($_POST["domainid"] ?? "");
+    $productid = $_POST["productid"] ?? "";
+    $productid = is_array($productid) ? array_values(array_filter(array_map("rcm_req_int", $productid))) : rcm_req_int($productid);
     $rcmdebuginfo = getDebuginfos();
     $modulename = $rcmdebuginfo["modulename"];
     $debug_addinfo = $rcmdebuginfo["debug_addinfo"];
